@@ -1,0 +1,18 @@
+{
+  "defaultSeverity": "error",
+  "extends": ["tslint-microsoft-contrib", "tslint-config-prettier"],
+  "jsRules": {},
+  "rules": {
+    "no-unnecessary-class": ["allow-static-only", "allow-constructor-only"],
+    "no-relative-imports": false,
+    "no-suspicious-comment": false,
+    "no-any": false,
+    "no-default-export": false,
+    "export-name": false,
+    "no-submodule-imports": false,
+    "import-name": false,
+    "no-shadowed-variable": false,
+    "interface-name": false,
+  },
+  "rulesDirectory": []
+}

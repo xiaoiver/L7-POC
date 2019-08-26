@@ -1,0 +1,76 @@
+{
+  "name": "@l7-poc/layers",
+  "version": "0.0.1",
+  "description": "",
+  "main": "lib/index.js",
+  "module": "esm/index.js",
+  "types": "esm/index.d.ts",
+  "sideEffects": false,
+  "files": [
+    "lib",
+    "esm",
+    "README.md"
+  ],
+  "scripts": {
+    "prebuild": "rimraf lib; rimraf esm;  mkdirp lib; mkdirp esm",
+    "build": "run-s lib minify",
+    "clean": "rimraf lib; rimraf esm",
+    "lib": "run-p lib:*",
+    "lib:cjs": "tsc --target ES5 --module commonjs --outDir lib",
+    "lib:esm": "tsc --target ES5 --module ESNext --outDir esm",
+    "minify": "sh ../../bin/minify.sh",
+    "watch": "tsc -w --target ESNext --module ESNext --outDir esm --sourceMap true",
+    "analyze": "mkdirp dist; npm run analyze:stats; npm run analyze:analyzer",
+    "analyze:stats": "webpack --config webpack.prod.js --profile --json > dist/stats.json",
+    "analyze:analyzer": "webpack-bundle-analyzer dist/stats.json",
+    "test": "jest",
+    "precommit": "npm run lint -q",
+    "prettier-check": "prettier --list-different 'src/**/*.{ts,tsx,js,jsx}'",
+    "prepublishOnly": "npm run build",
+    "lint": "tslint -c tslint.json 'src/**/*.ts'"
+  },
+  "author": "xiaoiver",
+  "license": "ISC",
+  "dependencies": {
+    "@l7-poc/core": "^0.0.1",
+    "inversify": "^5.0.1",
+    "inversify-inject-decorators": "^3.1.0"
+  },
+  "devDependencies": {
+    "@types/jest": "^21.1.10",
+    "jest": "^21.2.1",
+    "mkdirp": "^0.5.1",
+    "npm-run-all": "^4.1.5",
+    "prettier": "^1.11.1",
+    "rimraf": "^2.6.2",
+    "ts-jest": "^21.2.4",
+    "ts-loader": "^4.5.0",
+    "tslint": "^5.11.0",
+    "tslint-config-prettier": "^1.17.0",
+    "tslint-microsoft-contrib": "^5.2.1",
+    "typescript": "^3.4.5",
+    "uglify-es": "^3.3.9"
+  },
+  "jest": {
+    "globals": {
+      "ts-jest": {
+        "tsConfigFile": "tsconfig.jest.json",
+        "skipBabel": true
+      }
+    },
+    "transform": {
+      "^.+\\.tsx?$": "ts-jest"
+    },
+    "testRegex": "/src/.*(/__tests__/.*|\\.(test|spec))\\.(jsx?|tsx?)$",
+    "roots": [
+      "<rootDir>/src"
+    ],
+    "moduleFileExtensions": [
+      "ts",
+      "tsx",
+      "js",
+      "jsx",
+      "json"
+    ]
+  }
+}

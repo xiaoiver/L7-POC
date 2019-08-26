@@ -1,0 +1,11 @@
+{
+  "files": [],
+  "references": [
+    { "path": "core" },
+    { "path": "scene" },
+    { "path": "layers" },
+    { "path": "maps" },
+    { "path": "renderer" },
+    { "path": "react" }
+  ]
+}
