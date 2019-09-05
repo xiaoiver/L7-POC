@@ -1,29 +1,28 @@
+import { EventEmitter } from 'eventemitter3';
 import { inject, injectable } from 'inversify';
 import { ILogger, LoggingContext } from 'inversify-logging';
-import { EventEmitter } from 'eventemitter3';
-import { AsyncSeriesHook, AsyncParallelHook } from 'tapable';
+import { AsyncParallelHook, AsyncSeriesHook } from 'tapable';
 import { TYPES } from '../../types';
-import ILayerService, { ILayer } from '../layer/ILayerService';
-import ICameraService from '../camera/ICameraService';
-import IShaderModuleService from '../shader/IShaderModuleService';
-import IMapService, { IMapConfig, IMapCamera } from '../map/IMapService';
-import IRendererService from '../renderer/IRendererService';
-import ISceneService from './ISceneService';
 import { createRendererContainer } from '../../utils/dom';
+import ICameraService from '../camera/ICameraService';
+import ILayerService, { ILayer } from '../layer/ILayerService';
+import IMapService, { IMapCamera, IMapConfig } from '../map/IMapService';
+import IRendererService from '../renderer/IRendererService';
+import IShaderModuleService from '../shader/IShaderModuleService';
+import ISceneService from './ISceneService';
 
 @injectable()
 @LoggingContext('L7Scene')
 export default class Scene extends EventEmitter implements ISceneService {
-
   /**
    * 使用各种 Service
    */
-  @inject(TYPES.ILogService) logger: ILogger;
-  @inject(TYPES.IMapService) map: IMapService;
-  @inject(TYPES.IRendererService) renderer: IRendererService;
-  @inject(TYPES.ILayerService) layerManager: ILayerService;
-  @inject(TYPES.ICameraService) camera: ICameraService;
-  @inject(TYPES.IShaderModuleService) shaderModule: IShaderModuleService;
+  @inject(TYPES.ILogService) public logger: ILogger;
+  @inject(TYPES.IMapService) public map: IMapService;
+  @inject(TYPES.IRendererService) public renderer: IRendererService;
+  @inject(TYPES.ILayerService) public layerManager: ILayerService;
+  @inject(TYPES.ICameraService) public camera: ICameraService;
+  @inject(TYPES.IShaderModuleService) public shaderModule: IShaderModuleService;
 
   /**
    * 保存一份原始的地图配置
@@ -59,14 +58,14 @@ export default class Scene extends EventEmitter implements ISceneService {
     /**
      * 初始化底图
      */
-    this.hooks.init.tapPromise('initMap', async (config: IMapConfig) => {
+    this.hooks.init.tapPromise('initMap', async (config: unknown) => {
       // 等待首次相机同步
       await new Promise((resolve) => {
-        this.map.onCameraChanged((mapCamera: IMapCamera) => {
+        this.map.onCameraChanged((mapCamera: Partial<IMapCamera>) => {
           this.camera.update(mapCamera);
           resolve();
         });
-        this.map.init(config);
+        this.map.init(config as Partial<IMapCamera>);
       });
 
       // 重新绑定非首次相机更新事件
@@ -101,7 +100,7 @@ export default class Scene extends EventEmitter implements ISceneService {
     layer.init();
     this.layerManager.add(layer);
   }
-  
+
   public async render() {
     if (!this.inited) {
       // 首次渲染需要等待底图、相机初始化
@@ -113,8 +112,8 @@ export default class Scene extends EventEmitter implements ISceneService {
     this.renderer.render();
   }
 
-  private handleMapCameraChanged = (mapCamera: IMapCamera) => {
+  private handleMapCameraChanged = (mapCamera: Partial<IMapCamera>) => {
     this.camera.update(mapCamera);
     this.render();
-  }
+  };
 }

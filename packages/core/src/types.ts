@@ -1,9 +1,9 @@
 const TYPES = {
-  ILogService: 'ILogger',
-  ILayerService: Symbol.for('ILayerService'),
   ICameraService: Symbol.for('ICameraService'),
-  IRendererService: Symbol.for('IRendererService'),
+  ILayerService: Symbol.for('ILayerService'),
+  ILogService: 'ILogger',
   IMapService: Symbol.for('IMapService'),
+  IRendererService: Symbol.for('IRendererService'),
   IShaderModuleService: Symbol.for('IShaderModuleService'),
 };
 

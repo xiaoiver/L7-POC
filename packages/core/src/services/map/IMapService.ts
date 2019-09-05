@@ -47,7 +47,7 @@ export interface IMapConfig {
 
 /**
  * 地图相机参数
- * @see 
+ * @see
  */
 export interface IMapCamera {
   // Perspective 相机常规参数

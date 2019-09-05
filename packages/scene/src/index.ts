@@ -1,15 +1,24 @@
-import { container, ILayer, IMapConfig, IMapService, IRendererService, 
-  ISceneService, lazyInject, MapType, SceneService, TYPES } from '@l7-poc/core';
+import {
+  container,
+  ILayer,
+  IMapConfig,
+  IMapService,
+  IRendererService,
+  ISceneService,
+  MapType,
+  SceneService,
+  TYPES,
+} from '@l7-poc/core';
 import { AMapService, MapboxService } from '@l7-poc/maps';
 import { ReglRendererService } from '@l7-poc/renderer';
 
 /**
  * 暴露 Scene API
- * 
+ *
  * @example
  * import { Scene } from '@l7/scene';
  * import { PointLayer } from '@l7/layers';
- * 
+ *
  * const scene = new Scene();
  * const pointLayer = new PointLayer();
  * scene.addLayer(pointLayer);
@@ -41,7 +50,9 @@ class Scene {
 
     if (!container.isBound(TYPES.IRendererService)) {
       // 绑定渲染引擎
-      container.bind<IRendererService>(TYPES.IRendererService).to(ReglRendererService);
+      container
+        .bind<IRendererService>(TYPES.IRendererService)
+        .to(ReglRendererService);
     }
 
     // 依赖注入
@@ -58,6 +69,4 @@ class Scene {
   }
 }
 
-export {
-  Scene
-};
+export { Scene };

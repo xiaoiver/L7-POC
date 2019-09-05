@@ -15,7 +15,7 @@ yarn watch
 
 运行 Demo
 ```bash
-yarn demo
+yarn storybook
 ```
 
 代替 `git commit` 提交：

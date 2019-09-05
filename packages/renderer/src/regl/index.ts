@@ -2,23 +2,21 @@
  * render w/ regl
  * @see https://github.com/regl-project/regl/blob/gh-pages/API.md
  */
-import { inject, injectable } from 'inversify';
-import * as regl from 'regl';
 import { IRendererService } from '@l7-poc/core';
+import { inject, injectable } from 'inversify';
+import regl from 'regl';
 
 /**
  * regl renderer
  */
 @injectable()
 export default class ReglRendererService implements IRendererService {
-
   // tslint:disable-next-line:variable-name
   private _regl: regl.Regl;
 
   public async init($container: HTMLDivElement): Promise<void> {
     // tslint:disable-next-line:typedef
     this._regl = await new Promise((resolve, reject) => {
-      // @ts-ignore
       regl({
         container: $container,
         // extensions: [
@@ -31,12 +29,12 @@ export default class ReglRendererService implements IRendererService {
         // ],
         // optionalExtensions: ['oes_texture_float_linear'],
         // profile: true,
-        onDone: (err: any, r: regl.Regl): void => {
+        onDone: (err: Error | null, r?: regl.Regl | undefined): void => {
           if (err || !r) {
             reject(err);
           }
           resolve(r);
-        }
+        },
       });
     });
   }

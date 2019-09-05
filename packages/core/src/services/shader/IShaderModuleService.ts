@@ -7,7 +7,7 @@ export interface IModuleParams {
   fs: string;
   uniforms?: {
     [key: string]: any;
-  }
+  };
 }
 
 export default interface IShaderModuleService {

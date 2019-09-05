@@ -15,6 +15,6 @@ export function createRendererContainer(domId: string): HTMLDivElement | null {
     $wrapper.appendChild($container);
     return $container;
   }
-  
+
   return null;
 }

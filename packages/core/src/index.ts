@@ -1,10 +1,14 @@
 import container, { lazyInject } from './inversify.config';
-import IMapService, { IMapConfig, IMapCamera, MapType } from './services/map/IMapService';
 import { ILayer } from './services/layer/ILayerService';
-import IShaderModuleService from './services/shader/IShaderModuleService';
+import IMapService, {
+  IMapCamera,
+  IMapConfig,
+  MapType,
+} from './services/map/IMapService';
 import IRendererService from './services/renderer/IRendererService';
 import ISceneService from './services/scene/ISceneService';
 import SceneService from './services/scene/SceneService';
+import IShaderModuleService from './services/shader/IShaderModuleService';
 import { TYPES } from './types';
 
 export {
@@ -27,8 +31,12 @@ export {
   /**
    * 各个 Service 接口
    */
-  ISceneService, SceneService,
-  IMapService, IMapConfig, IMapCamera, MapType,
+  ISceneService,
+  SceneService,
+  IMapService,
+  IMapConfig,
+  IMapCamera,
+  MapType,
   IShaderModuleService,
   IRendererService,
 };

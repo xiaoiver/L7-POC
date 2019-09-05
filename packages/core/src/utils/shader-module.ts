@@ -26,11 +26,13 @@ export function getUniformLengthByType(type: string): number {
 }
 
 const uniformRegExp = /uniform\s+(bool|float|int|vec2|vec3|vec4|ivec2|ivec3|ivec4|mat2|mat3|mat4|sampler2D|samplerCube)\s+([\s\S]*?);/g;
-export function extractUniforms(content: string): {
+export function extractUniforms(
+  content: string,
+): {
   content: string;
   uniforms: {
     [key: string]: any;
-  }
+  };
 } {
   const uniforms = {};
   content = content.replace(uniformRegExp, (_, type, c) => {
@@ -61,7 +63,9 @@ export function extractUniforms(content: string): {
       case 'mat3':
       case 'mat4':
         if (defaultValue) {
-          defaultValue = defaultValue.replace('[', '').replace(']', '')
+          defaultValue = defaultValue
+            .replace('[', '')
+            .replace(']', '')
             .split(',')
             .reduce((prev: number[], cur: string) => {
               prev.push(Number(cur.trim()));
@@ -74,11 +78,12 @@ export function extractUniforms(content: string): {
       default:
     }
 
+    // @ts-ignore
     uniforms[uniformName] = defaultValue;
     return `uniform ${type} ${uniformName};\n`;
   });
   return {
     content,
-    uniforms
+    uniforms,
   };
 }

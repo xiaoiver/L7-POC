@@ -1,11 +1,12 @@
 /**
  * AMapService
  */
+import { IMapCamera, IMapConfig, IMapService } from '@l7-poc/core';
 import { inject, injectable } from 'inversify';
 import mapboxgl from 'mapbox-gl';
-import { IMapConfig, IMapService, IMapCamera } from '@l7-poc/core';
 
-mapboxgl.accessToken = 'pk.eyJ1IjoieGlhb2l2ZXIiLCJhIjoiY2pxcmc5OGNkMDY3cjQzbG42cXk5NTl3YiJ9.hUC5Chlqzzh0FFd_aEc-uQ';
+mapboxgl.accessToken =
+  'pk.eyJ1IjoieGlhb2l2ZXIiLCJhIjoiY2pxcmc5OGNkMDY3cjQzbG42cXk5NTl3YiJ9.hUC5Chlqzzh0FFd_aEc-uQ';
 
 /**
  * AMapService
@@ -22,9 +23,10 @@ export default class MapboxService implements IMapService {
      * TODO: 使用 mapbox v0.53.x 版本 custom layer，需要共享 gl context
      * @see https://github.com/mapbox/mapbox-gl-js/blob/master/debug/threejs.html#L61-L64
      */
+    // @ts-ignore
     this.map = new mapboxgl.Map({
       container: id,
-      ...rest
+      ...rest,
     });
 
     this.map.on('move', this.handleCameraChanged);
@@ -33,12 +35,15 @@ export default class MapboxService implements IMapService {
     this.handleCameraChanged();
 
     const $link: HTMLLinkElement = document.createElement('link');
-    $link.href = 'https://api.tiles.mapbox.com/mapbox-gl-js/v1.2.1/mapbox-gl.css';
+    $link.href =
+      'https://api.tiles.mapbox.com/mapbox-gl-js/v1.2.1/mapbox-gl.css';
     $link.rel = 'stylesheet';
     document.head.appendChild($link);
   }
 
-  public onCameraChanged(callback: (camera: Partial<IMapCamera>) => void): void {
+  public onCameraChanged(
+    callback: (camera: Partial<IMapCamera>) => void,
+  ): void {
     this.cameraChangedCallback = callback;
   }
 
@@ -46,12 +51,12 @@ export default class MapboxService implements IMapService {
     // @see https://github.com/mapbox/mapbox-gl-js/issues/2572
     const { lat, lng } = this.map.getCenter().wrap();
     this.cameraChangedCallback({
-      zoom: this.map.getZoom(),
-      center: [ lng, lat ],
-      pitch: this.map.getPitch(),
       bearing: this.map.getBearing(),
+      center: [lng, lat],
       height: this.map.transform.height,
-      width: this.map.transform.width
+      pitch: this.map.getPitch(),
+      width: this.map.transform.width,
+      zoom: this.map.getZoom(),
     });
-  }
+  };
 }

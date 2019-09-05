@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 import { ILayer, IShaderModuleService, lazyInject, TYPES } from '@l7-poc/core';
 
@@ -13,6 +13,7 @@ export default class PointLayer implements ILayer {
   public name: string = 'pointLayer';
 
   public init(): void {
-    // this.shaderModule.registerModule();
+    // const r = this.shaderModule.getModule('circle');
+    // console.log(r);
   }
 }
