@@ -17,12 +17,23 @@ export default class Scene extends EventEmitter implements ISceneService {
   /**
    * 使用各种 Service
    */
-  @inject(TYPES.ILogService) public logger: ILogger;
-  @inject(TYPES.IMapService) public map: IMapService;
-  @inject(TYPES.IRendererService) public renderer: IRendererService;
-  @inject(TYPES.ILayerService) public layerManager: ILayerService;
-  @inject(TYPES.ICameraService) public camera: ICameraService;
-  @inject(TYPES.IShaderModuleService) public shaderModule: IShaderModuleService;
+  @inject(TYPES.ILogService)
+  private readonly logger: ILogger;
+
+  @inject(TYPES.IMapService)
+  private readonly map: IMapService;
+
+  @inject(TYPES.IRendererService)
+  private readonly renderer: IRendererService;
+
+  @inject(TYPES.ILayerService)
+  private readonly layerManager: ILayerService;
+
+  @inject(TYPES.ICameraService)
+  private readonly camera: ICameraService;
+
+  @inject(TYPES.IShaderModuleService)
+  private readonly shaderModule: IShaderModuleService;
 
   /**
    * 保存一份原始的地图配置
@@ -62,6 +73,7 @@ export default class Scene extends EventEmitter implements ISceneService {
       // 等待首次相机同步
       await new Promise((resolve) => {
         this.map.onCameraChanged((mapCamera: Partial<IMapCamera>) => {
+          this.camera.init();
           this.camera.update(mapCamera);
           resolve();
         });
@@ -97,7 +109,6 @@ export default class Scene extends EventEmitter implements ISceneService {
 
   public addLayer(layer: ILayer) {
     this.logger.info('add layer', layer.name);
-    layer.init();
     this.layerManager.add(layer);
   }
 
@@ -107,9 +118,12 @@ export default class Scene extends EventEmitter implements ISceneService {
       await this.hooks.init.promise(this.mapConfig);
       this.emit('loaded');
       this.inited = true;
+
+      this.layerManager.initLayers();
     }
+
+    await this.layerManager.renderLayers();
     this.logger.info('render');
-    this.renderer.render();
   }
 
   private handleMapCameraChanged = (mapCamera: Partial<IMapCamera>) => {

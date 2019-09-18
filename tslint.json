@@ -13,6 +13,7 @@
       "avoid-escape",
       "avoid-template",
       "jsx-double"
-    ]
+    ],
+    "object-literal-sort-keys": false
   }
 }

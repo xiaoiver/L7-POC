@@ -8,12 +8,22 @@ import IShaderModuleService, { IModuleParams } from './IShaderModuleService';
 import circleFrag from '../../shaders/circle_frag.glsl';
 import circleVert from '../../shaders/circle_vert.glsl';
 import decode from '../../shaders/decode.glsl';
+import projection from '../../shaders/projection.glsl';
 import sdf2d from '../../shaders/sdf_2d.glsl';
 
 const precisionRegExp = /precision\s+(high|low|medium)p\s+float/;
 const globalDefaultprecision =
   '#ifdef GL_FRAGMENT_PRECISION_HIGH\n precision highp float;\n #else\n precision mediump float;\n#endif\n';
 const includeRegExp = /#pragma include (["^+"]?["\ "[a-zA-Z_0-9](.*)"]*?)/g;
+
+// 后续传入 Shader 的变量
+export const Uniform = {
+  ProjectionMatrix: 'u_ProjectionMatrix',
+  ViewMatrix: 'u_ViewMatrix',
+  Zoom: 'u_Zoom',
+  PixelsPerMeter: 'u_pixels_per_meter',
+  ProjectionScale: 'u_project_scale',
+};
 
 @injectable()
 @LoggingContext('ShaderModuleService')
@@ -25,6 +35,7 @@ export default class ShaderModuleService implements IShaderModuleService {
 
   public registerBuiltinModules() {
     this.registerModule('decode', { vs: decode, fs: '' });
+    this.registerModule('projection', { vs: projection, fs: '' });
     this.registerModule('sdf_2d', { vs: '', fs: sdf2d });
     this.registerModule('circle', { vs: circleVert, fs: circleFrag });
 
@@ -65,6 +76,7 @@ export default class ShaderModuleService implements IShaderModuleService {
       [],
       'fs',
     );
+    let compiledFs = fs;
     // TODO: extract uniforms and their default values from GLSL
     const uniforms: {
       [key: string]: any;
@@ -82,12 +94,12 @@ export default class ShaderModuleService implements IShaderModuleService {
      * set default precision for fragment shader
      * https://stackoverflow.com/questions/28540290/why-it-is-necessary-to-set-precision-for-the-fragment-shader
      */
-    // if (!precisionRegExp.test(fs)) {
-    //   fs = globalDefaultprecision + fs;
-    // }
+    if (!precisionRegExp.test(fs)) {
+      compiledFs = globalDefaultprecision + fs;
+    }
 
     this.moduleCache[moduleName] = {
-      fs: fs.trim(),
+      fs: compiledFs.trim(),
       uniforms,
       vs: vs.trim(),
     };

@@ -1,6 +1,11 @@
 attribute vec4 a_packed_data;
+attribute vec2 a_Position;
 
-uniform float u_zoom : 1;
+uniform mat4 u_ViewMatrix;
+uniform mat4 u_ProjectionMatrix;
+uniform mat4 u_ModelMatrix;
+
+uniform float u_Zoom : 1;
 uniform float u_stroke_width : 2;
 
 varying vec4 v_data;
@@ -8,6 +13,7 @@ varying vec4 v_color;
 varying float v_radius;
 
 #pragma include "decode"
+#pragma include "projection"
 
 void main() {
   // unpack color(vec2)
@@ -35,9 +41,12 @@ void main() {
   float radius = compressed;
   v_radius = radius;
 
-  float zoom_scale = pow(2., 20. - u_zoom);
-  vec2 offset = extrude * (radius + u_stroke_width) * zoom_scale;
-  gl_Position = projectionMatrix * modelViewMatrix * vec4(position.xy + offset, 0.0, 1.0);
+  vec2 offset = extrude * (radius + u_stroke_width);
+
+  vec4 project_pos = project_position(vec4(a_Position.xy, 0.0, 1.0));
+
+  // gl_PointSize = 10.0;
+  gl_Position = u_ProjectionMatrix * u_ViewMatrix * vec4(project_pos.xy + offset, 0.0, 1.0);
 
   // anti-alias
   float antialiasblur = 1.0 / (radius + u_stroke_width);

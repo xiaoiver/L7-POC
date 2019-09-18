@@ -12,6 +12,11 @@ import {
 import { AMapService, MapboxService } from '@l7-poc/maps';
 import { ReglRendererService } from '@l7-poc/renderer';
 
+// 绑定渲染引擎服务
+container
+  .bind<IRendererService>(TYPES.IRendererService)
+  .to(ReglRendererService);
+
 /**
  * 暴露 Scene API
  *
@@ -46,13 +51,6 @@ class Scene {
       container.rebind<IMapService>(TYPES.IMapService).to(mapService);
     } else {
       container.bind<IMapService>(TYPES.IMapService).to(mapService);
-    }
-
-    if (!container.isBound(TYPES.IRendererService)) {
-      // 绑定渲染引擎
-      container
-        .bind<IRendererService>(TYPES.IRendererService)
-        .to(ReglRendererService);
     }
 
     // 依赖注入

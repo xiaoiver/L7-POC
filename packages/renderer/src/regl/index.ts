@@ -2,21 +2,35 @@
  * render w/ regl
  * @see https://github.com/regl-project/regl/blob/gh-pages/API.md
  */
-import { IRendererService } from '@l7-poc/core';
+import {
+  glEnum,
+  IAttribute,
+  IAttributeInitializationOptions,
+  IBuffer,
+  IBufferInitializationOptions,
+  IElements,
+  IElementsInitializationOptions,
+  IModel,
+  IModelInitializationOptions,
+  IRendererService,
+} from '@l7-poc/core';
 import { inject, injectable } from 'inversify';
 import regl from 'regl';
+import ReglAttribute from './ReglAttribute';
+import ReglBuffer from './ReglBuffer';
+import ReglElements from './ReglElements';
+import ReglModel from './ReglModel';
 
 /**
  * regl renderer
  */
 @injectable()
 export default class ReglRendererService implements IRendererService {
-  // tslint:disable-next-line:variable-name
-  private _regl: regl.Regl;
+  private gl: regl.Regl;
 
   public async init($container: HTMLDivElement): Promise<void> {
     // tslint:disable-next-line:typedef
-    this._regl = await new Promise((resolve, reject) => {
+    this.gl = await new Promise((resolve, reject) => {
       regl({
         container: $container,
         // extensions: [
@@ -39,18 +53,23 @@ export default class ReglRendererService implements IRendererService {
     });
   }
 
-  // public createDrawCommand(): regl.DrawCommand {
-  //   return this._regl({
-  //     vert: this.prefixDefines(vs, defines),
-  //     frag: this.prefixDefines(fs, defines),
-  //     attributes: uniqueAttributes,
-  //     uniforms: {
+  public createModel = (options: IModelInitializationOptions): IModel => {
+    return new ReglModel(this.gl, options);
+  };
 
-  //     }
-  //   });
-  // }
+  public createAttribute = (
+    options: IAttributeInitializationOptions,
+  ): IAttribute => {
+    return new ReglAttribute(this.gl, options);
+  };
 
-  public render(): void {
-    //
-  }
+  public createBuffer = (options: IBufferInitializationOptions): IBuffer => {
+    return new ReglBuffer(this.gl, options);
+  };
+
+  public createElements = (
+    options: IElementsInitializationOptions,
+  ): IElements => {
+    return new ReglElements(this.gl, options);
+  };
 }

@@ -5,11 +5,26 @@ import IMapService, {
   IMapConfig,
   MapType,
 } from './services/map/IMapService';
-import IRendererService from './services/renderer/IRendererService';
+import { glEnum } from './services/renderer/glenum';
+import IAttribute, {
+  IAttributeInitializationOptions,
+} from './services/renderer/IAttribute';
+import IBuffer, {
+  IBufferInitializationOptions,
+} from './services/renderer/IBuffer';
+import IElements, {
+  IElementsInitializationOptions,
+} from './services/renderer/IElements';
+import IRendererService, {
+  IModel,
+  IModelDrawOptions,
+  IModelInitializationOptions,
+} from './services/renderer/IRendererService';
 import ISceneService from './services/scene/ISceneService';
 import SceneService from './services/scene/SceneService';
 import IShaderModuleService from './services/shader/IShaderModuleService';
 import { TYPES } from './types';
+import { packCircleVertex } from './utils/vertex-compression';
 
 export {
   /**
@@ -39,4 +54,15 @@ export {
   MapType,
   IShaderModuleService,
   IRendererService,
+  IModel,
+  IModelDrawOptions,
+  IModelInitializationOptions,
+  packCircleVertex,
+  IAttribute,
+  IAttributeInitializationOptions,
+  IElements,
+  IElementsInitializationOptions,
+  IBuffer,
+  IBufferInitializationOptions,
+  glEnum,
 };
