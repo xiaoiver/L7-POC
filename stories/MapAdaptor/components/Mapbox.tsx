@@ -37,21 +37,26 @@ export default class Mapbox extends React.Component {
     scene.addLayer(pointLayer);
     scene.render();
 
+    /*** 运行时修改样式属性 ***/
+
     const gui = new dat.GUI();
     this.gui = gui;
-    const pointFolder = gui.addFolder('leaf point');
-    pointFolder.addColor(pointLayer, 'pointColor').onChange(() => {
-      scene.render();
-    });
+    const pointFolder = gui.addFolder('Point 样式属性');
+    pointFolder
+      .addColor(pointLayer.styleOptions, 'pointColor')
+      .onChange((pointColor: [number, number, number]) => {
+        pointLayer.style({
+          pointColor,
+        });
+        scene.render();
+      });
 
     pointFolder
-      .add(pointLayer, 'strokeWidth', 1, 10, 0.1)
-      .onChange((v: number) => {
-        // pointLayer.render({
-        //   uniforms: {
-        //     u_stroke_width: v,
-        //   },
-        // });
+      .add(pointLayer.styleOptions, 'strokeWidth', 1, 10, 0.1)
+      .onChange((strokeWidth: number) => {
+        pointLayer.style({
+          strokeWidth,
+        });
         scene.render();
       });
   }

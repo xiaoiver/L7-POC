@@ -1,9 +1,15 @@
 import { AsyncParallelHook, AsyncSeriesHook } from 'tapable';
 import { IModelDrawOptions } from '../renderer/IRendererService';
 
+interface IStyleOptions {
+  [key: string]: any;
+}
+
 export interface ILayer {
   name: string;
+  styleOptions: IStyleOptions;
   init(): void;
+  style(options: IStyleOptions): void;
   render(options: IModelDrawOptions): void;
   source(options: { data: any }): void;
 }

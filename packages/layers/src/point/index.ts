@@ -11,6 +11,18 @@ import {
 } from '@l7-poc/core';
 import { featureEach } from '@turf/meta';
 
+type Color = [number, number, number];
+
+interface IPointStyleOptions {
+  pointShape: string;
+  pointColor: Color;
+  pointRadius: number;
+  pointOpacity: number;
+  strokeWidth: number;
+  strokeColor: Color;
+  strokeOpacity: number;
+}
+
 interface IPointFeature {
   coordinates: [number, number];
 }
@@ -22,13 +34,15 @@ export default class PointLayer implements ILayer {
   public name: string = 'pointLayer';
 
   // TODO: use ConfigService
-  public pointShape = 'circle';
-  public pointColor = [81, 187, 214];
-  public pointRadius = 10;
-  public pointOpacity = 1;
-  public strokeWidth = 2;
-  public strokeColor = [255, 255, 255];
-  public strokeOpacity = 1;
+  public styleOptions: IPointStyleOptions = {
+    pointShape: 'circle',
+    pointColor: [81, 187, 214],
+    pointRadius: 10,
+    pointOpacity: 1,
+    strokeWidth: 2,
+    strokeColor: [255, 255, 255],
+    strokeOpacity: 1,
+  };
 
   @lazyInject(TYPES.IShaderModuleService)
   private readonly shaderModule: IShaderModuleService;
@@ -93,6 +107,13 @@ export default class PointLayer implements ILayer {
     });
   }
 
+  public style(options: Partial<IPointStyleOptions>): void {
+    this.styleOptions = {
+      ...this.styleOptions,
+      ...options,
+    };
+  }
+
   public render(options: IModelDrawOptions): void {
     const { uniforms } = options;
     this.model.draw({
@@ -116,26 +137,37 @@ export default class PointLayer implements ILayer {
     const positionBuffer: number[][] = [];
     const indexBuffer: Array<[number, number, number]> = [];
 
+    const {
+      pointColor,
+      pointRadius,
+      pointShape,
+      pointOpacity,
+      strokeColor,
+      strokeWidth,
+      strokeOpacity,
+    } = this.styleOptions;
+
     let i = 0;
     pointFeatures.forEach((pointFeature) => {
       // TODO: 判断是否使用瓦片坐标
       const [tileX, tileY] = pointFeature.coordinates;
 
       // 压缩顶点数据
+      // TODO: 某些变量通过 uniform 而非 vertex attribute 传入
       const {
         packedBuffer: packed1,
         packedBuffer2: packed2,
         packedBuffer3: packed3,
       } = packCircleVertex({
-        color: [...this.pointColor, 255],
-        radius: this.pointRadius,
+        color: [...pointColor, 255],
+        radius: pointRadius,
         tileX: 0,
         tileY: 0,
-        shape: this.pointShape,
-        opacity: this.pointOpacity,
-        strokeColor: [...this.strokeColor, 255],
-        strokeOpacity: this.strokeOpacity,
-        strokeWidth: this.strokeWidth,
+        shape: pointShape,
+        opacity: pointOpacity,
+        strokeColor: [...strokeColor, 255],
+        strokeOpacity,
+        strokeWidth,
       });
       packedBuffer.push(...packed1);
       packedBuffer2.push(...packed2);
