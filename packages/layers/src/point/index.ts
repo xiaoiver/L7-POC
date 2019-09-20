@@ -1,6 +1,8 @@
 import {
   glEnum,
   ILayer,
+  ILayerStyleOptions,
+  ILayerStyleService,
   IModel,
   IModelDrawOptions,
   IRendererService,
@@ -10,16 +12,15 @@ import {
   TYPES,
 } from '@l7-poc/core';
 import { featureEach } from '@turf/meta';
+import { BaseLayer } from '..';
 
-type Color = [number, number, number];
-
-interface IPointStyleOptions {
+export interface IPointLayerStyleOptions extends ILayerStyleOptions {
   pointShape: string;
-  pointColor: Color;
+  pointColor: [number, number, number];
   pointRadius: number;
   pointOpacity: number;
   strokeWidth: number;
-  strokeColor: Color;
+  strokeColor: [number, number, number];
   strokeOpacity: number;
 }
 
@@ -30,11 +31,8 @@ interface IPointFeature {
 /**
  * PointLayer
  */
-export default class PointLayer implements ILayer {
-  public name: string = 'pointLayer';
-
-  // TODO: use ConfigService
-  public styleOptions: IPointStyleOptions = {
+export default class PointLayer extends BaseLayer {
+  public styleOptions: IPointLayerStyleOptions = {
     pointShape: 'circle',
     pointColor: [81, 187, 214],
     pointRadius: 10,
@@ -44,11 +42,16 @@ export default class PointLayer implements ILayer {
     strokeOpacity: 1,
   };
 
+  public name: string = 'pointLayer';
+
   @lazyInject(TYPES.IShaderModuleService)
   private readonly shaderModule: IShaderModuleService;
 
   @lazyInject(TYPES.IRendererService)
   private readonly renderer: IRendererService;
+
+  @lazyInject(TYPES.ILayerStyleService)
+  private readonly layerStyleService: ILayerStyleService;
 
   private model: IModel;
 
@@ -107,18 +110,18 @@ export default class PointLayer implements ILayer {
     });
   }
 
-  public style(options: Partial<IPointStyleOptions>): void {
-    this.styleOptions = {
-      ...this.styleOptions,
-      ...options,
-    };
+  public style(options: Partial<IPointLayerStyleOptions>): void {
+    // this.layerStyleService.update(options);
+    // this.styleOptions = {
+    //   ...this.styleOptions,
+    //   ...options,
+    // };
   }
 
-  public render(options: IModelDrawOptions): void {
-    const { uniforms } = options;
+  public render(): void {
     this.model.draw({
       uniforms: {
-        ...uniforms,
+        ...this.uniforms,
         u_ModelMatrix: [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1],
         u_pixels_per_meter: [1, 1, 1],
         u_stroke_width: 1,

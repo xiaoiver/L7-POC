@@ -1,17 +1,24 @@
-import { AsyncParallelHook, AsyncSeriesHook } from 'tapable';
-import { IModelDrawOptions } from '../renderer/IRendererService';
-
-interface IStyleOptions {
-  [key: string]: any;
-}
+import { AsyncParallelHook, SyncHook } from 'tapable';
+import { ILayerStyleOptions } from './ILayerStyleService';
 
 export interface ILayer {
+  styleOptions: ILayerStyleOptions;
   name: string;
-  styleOptions: IStyleOptions;
+  plugins: ILayerPlugin[];
+  hooks: {
+    beforeRender: SyncHook<unknown>;
+    afterRender: SyncHook<unknown>;
+  };
   init(): void;
-  style(options: IStyleOptions): void;
-  render(options: IModelDrawOptions): void;
+  style(options: ILayerStyleOptions): void;
+  render(): void;
   source(options: { data: any }): void;
+  addPlugin(plugin: ILayerPlugin): void;
+  addUniforms(uniforms: { [key: string]: any }): void;
+}
+
+export interface ILayerPlugin {
+  apply(layer: ILayer): void;
 }
 
 /**

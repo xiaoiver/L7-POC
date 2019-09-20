@@ -5,6 +5,15 @@ import { TYPES } from '../../types';
 import { IMapCamera } from '../map/IMapService';
 import ICameraService from './CameraService';
 
+// 后续传入 Shader 的变量
+export const CameraUniform = {
+  ProjectionMatrix: 'u_ProjectionMatrix',
+  ViewMatrix: 'u_ViewMatrix',
+  Zoom: 'u_Zoom',
+  PixelsPerMeter: 'u_pixels_per_meter',
+  ProjectionScale: 'u_project_scale',
+};
+
 @injectable()
 @LoggingContext('CameraService')
 export default class CameraService implements ICameraService {

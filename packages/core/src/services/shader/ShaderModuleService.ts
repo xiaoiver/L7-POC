@@ -16,15 +16,6 @@ const globalDefaultprecision =
   '#ifdef GL_FRAGMENT_PRECISION_HIGH\n precision highp float;\n #else\n precision mediump float;\n#endif\n';
 const includeRegExp = /#pragma include (["^+"]?["\ "[a-zA-Z_0-9](.*)"]*?)/g;
 
-// 后续传入 Shader 的变量
-export const Uniform = {
-  ProjectionMatrix: 'u_ProjectionMatrix',
-  ViewMatrix: 'u_ViewMatrix',
-  Zoom: 'u_Zoom',
-  PixelsPerMeter: 'u_pixels_per_meter',
-  ProjectionScale: 'u_project_scale',
-};
-
 @injectable()
 @LoggingContext('ShaderModuleService')
 export default class ShaderModuleService implements IShaderModuleService {

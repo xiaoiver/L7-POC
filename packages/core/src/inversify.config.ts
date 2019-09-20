@@ -9,11 +9,13 @@ import { TYPES } from './types';
 /** Service interfaces */
 import ICameraService from './services/camera/ICameraService';
 import ILayerService from './services/layer/ILayerService';
+import ILayerStyleService from './services/layer/ILayerStyleService';
 import IShaderModuleService from './services/shader/IShaderModuleService';
 
 /** Service implements */
 import CameraService from './services/camera/CameraService';
 import LayerService from './services/layer/LayerService';
+import LayerStyleService from './services/layer/LayerStyleService';
 import ShaderModuleService from './services/shader/ShaderModuleService';
 
 // @see https://github.com/inversify/InversifyJS/blob/master/wiki/container_api.md#defaultscope
@@ -48,11 +50,15 @@ const lazyInject = (serviceIdentifier: interfaces.ServiceIdentifier<any>) => {
 };
 
 container.bind<ILayerService>(TYPES.ILayerService).to(LayerService);
+container
+  .bind<ILayerStyleService>(TYPES.ILayerStyleService)
+  .to(LayerStyleService);
 container.bind<ICameraService>(TYPES.ICameraService).to(CameraService);
 container
   .bind<IShaderModuleService>(TYPES.IShaderModuleService)
   .to(ShaderModuleService);
 
+// @see https://github.com/inversify/InversifyJS/blob/master/wiki/inheritance.md#what-can-i-do-when-my-base-class-is-provided-by-a-third-party-module
 decorate(injectable(), EventEmitter);
 activateLogging(container);
 

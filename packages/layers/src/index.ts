@@ -1,3 +1,4 @@
+import BaseLayer from './BaseLayer';
 import PointLayer from './point';
 
-export { PointLayer };
+export { BaseLayer, PointLayer };

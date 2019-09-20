@@ -1,5 +1,10 @@
 import container, { lazyInject } from './inversify.config';
-import { ILayer } from './services/layer/ILayerService';
+import { CameraUniform } from './services/camera/CameraService';
+import ICameraService from './services/camera/ICameraService';
+import { ILayer, ILayerPlugin } from './services/layer/ILayerService';
+import ILayerStyleService, {
+  ILayerStyleOptions,
+} from './services/layer/ILayerStyleService';
 import IMapService, {
   IMapCamera,
   IMapConfig,
@@ -31,6 +36,7 @@ export {
    * IoC 容器
    */
   container,
+  CameraUniform,
   /**
    * lazy inject，供各个 Layer 使用
    */
@@ -46,12 +52,16 @@ export {
   /**
    * 各个 Service 接口
    */
+  ICameraService,
   ISceneService,
   SceneService,
   IMapService,
   IMapConfig,
   IMapCamera,
   MapType,
+  ILayerPlugin,
+  ILayerStyleService,
+  ILayerStyleOptions,
   IShaderModuleService,
   IRendererService,
   IModel,
