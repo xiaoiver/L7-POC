@@ -18,7 +18,8 @@ import ShaderUniformPlugin from './plugins/ShaderUniformPlugin';
 export default class BaseLayer implements ILayer {
   public styleOptions: ILayerStyleOptions;
   public name: string;
-  public uniforms: { [key: string]: any } = {};
+
+  public models: IModel[] = [];
 
   // 生命周期钩子
   public hooks = {
@@ -27,18 +28,18 @@ export default class BaseLayer implements ILayer {
   };
 
   // 插件集
-  public plugins: ILayerPlugin[] = [new ShaderUniformPlugin()];
+  public plugins: ILayerPlugin[] = [
+    // new CoordinatePlugin(),
+    new ShaderUniformPlugin(),
+  ];
 
   public addPlugin(plugin: ILayerPlugin) {
     // TODO: 控制插件注册顺序
+    // @example:
+    // pointLayer.addPlugin(new MyCustomPlugin(), {
+    //   before: 'L7BuiltinPlugin'
+    // });
     this.plugins.push(plugin);
-  }
-
-  public addUniforms(uniforms: { [key: string]: any }): void {
-    this.uniforms = {
-      ...this.uniforms,
-      ...uniforms,
-    };
   }
 
   public init(): void {

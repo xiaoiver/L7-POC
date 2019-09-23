@@ -1,6 +1,8 @@
 import container, { lazyInject } from './inversify.config';
 import { CameraUniform } from './services/camera/CameraService';
 import ICameraService from './services/camera/ICameraService';
+import { CoordinateUniform } from './services/coordinate/CoordinateSystemService';
+import ICoordinateSystemService from './services/coordinate/ICoordinateSystemService';
 import { ILayer, ILayerPlugin } from './services/layer/ILayerService';
 import ILayerStyleService, {
   ILayerStyleOptions,
@@ -20,11 +22,11 @@ import IBuffer, {
 import IElements, {
   IElementsInitializationOptions,
 } from './services/renderer/IElements';
-import IRendererService, {
-  IModel,
+import IModel, {
   IModelDrawOptions,
   IModelInitializationOptions,
-} from './services/renderer/IRendererService';
+} from './services/renderer/IModel';
+import IRendererService from './services/renderer/IRendererService';
 import ISceneService from './services/scene/ISceneService';
 import SceneService from './services/scene/SceneService';
 import IShaderModuleService from './services/shader/IShaderModuleService';
@@ -37,6 +39,7 @@ export {
    */
   container,
   CameraUniform,
+  CoordinateUniform,
   /**
    * lazy inject，供各个 Layer 使用
    */
@@ -53,6 +56,7 @@ export {
    * 各个 Service 接口
    */
   ICameraService,
+  ICoordinateSystemService,
   ISceneService,
   SceneService,
   IMapService,

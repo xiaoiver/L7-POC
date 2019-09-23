@@ -1,5 +1,6 @@
 const TYPES = {
   ICameraService: Symbol.for('ICameraService'),
+  ICoordinateSystemService: Symbol.for('ICoordinateSystemService'),
   ILayerService: Symbol.for('ILayerService'),
   ILayerStyleService: Symbol.for('ILayerStyleService'),
   ILogService: 'ILogger',

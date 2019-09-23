@@ -1,4 +1,5 @@
 import { AsyncParallelHook, SyncHook } from 'tapable';
+import IModel from '../renderer/IModel';
 import { ILayerStyleOptions } from './ILayerStyleService';
 
 export interface ILayer {
@@ -9,12 +10,12 @@ export interface ILayer {
     beforeRender: SyncHook<unknown>;
     afterRender: SyncHook<unknown>;
   };
+  models: IModel[];
   init(): void;
   style(options: ILayerStyleOptions): void;
   render(): void;
   source(options: { data: any }): void;
   addPlugin(plugin: ILayerPlugin): void;
-  addUniforms(uniforms: { [key: string]: any }): void;
 }
 
 export interface ILayerPlugin {

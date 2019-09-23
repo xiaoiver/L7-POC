@@ -8,12 +8,14 @@ import { TYPES } from './types';
 
 /** Service interfaces */
 import ICameraService from './services/camera/ICameraService';
+import ICoordinateSystemService from './services/coordinate/ICoordinateSystemService';
 import ILayerService from './services/layer/ILayerService';
 import ILayerStyleService from './services/layer/ILayerStyleService';
 import IShaderModuleService from './services/shader/IShaderModuleService';
 
 /** Service implements */
 import CameraService from './services/camera/CameraService';
+import CoordinateSystemService from './services/coordinate/CoordinateSystemService';
 import LayerService from './services/layer/LayerService';
 import LayerStyleService from './services/layer/LayerStyleService';
 import ShaderModuleService from './services/shader/ShaderModuleService';
@@ -54,6 +56,9 @@ container
   .bind<ILayerStyleService>(TYPES.ILayerStyleService)
   .to(LayerStyleService);
 container.bind<ICameraService>(TYPES.ICameraService).to(CameraService);
+container
+  .bind<ICoordinateSystemService>(TYPES.ICoordinateSystemService)
+  .to(CoordinateSystemService);
 container
   .bind<IShaderModuleService>(TYPES.IShaderModuleService)
   .to(ShaderModuleService);

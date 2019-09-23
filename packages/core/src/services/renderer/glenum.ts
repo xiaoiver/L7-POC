@@ -1,6 +1,8 @@
 /**
  * WebGL 枚举值
  * @see http://www.khronos.org/registry/webgl/specs/latest/1.0/#5.14
+ * TODO: 使用 babel 插件对常量进行内联，以减少最终打包产物大小
+ * @see https://github.com/uber/deck.gl/blob/7.1-release/dev-docs/roadmaps/dist-size-roadmap.md#inline-gl-constants
  */
 
 export enum glEnum {

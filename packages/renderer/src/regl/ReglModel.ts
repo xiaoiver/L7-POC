@@ -15,6 +15,9 @@ import ReglElements from './ReglElements';
 export default class ReglModel implements IModel {
   private gl: regl.Regl;
   private drawCommand: regl.DrawCommand;
+  private uniforms: {
+    [key: string]: number | number[] | boolean;
+  } = {};
 
   constructor(gl: regl.Regl, options: IModelInitializationOptions) {
     this.gl = gl;
@@ -30,6 +33,7 @@ export default class ReglModel implements IModel {
 
     const reglUniforms: { [key: string]: any } = {};
     if (uniforms) {
+      this.uniforms = uniforms;
       Object.keys(uniforms).forEach((uniformName) => {
         // @ts-ignore
         reglUniforms[uniformName] = this.gl.prop(uniformName);
@@ -74,8 +78,18 @@ export default class ReglModel implements IModel {
     this.drawCommand = this.gl(drawParams);
   }
 
+  public addUniforms(uniforms: { [key: string]: number | number[] | boolean }) {
+    this.uniforms = {
+      ...this.uniforms,
+      ...uniforms,
+    };
+  }
+
   public draw(options: IModelDrawOptions) {
     // @ts-ignore
-    this.drawCommand(options.uniforms);
+    this.drawCommand({
+      ...this.uniforms,
+      ...options.uniforms,
+    });
   }
 }

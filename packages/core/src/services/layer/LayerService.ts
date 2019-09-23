@@ -2,7 +2,6 @@ import { inject, injectable } from 'inversify';
 import { AsyncParallelHook } from 'tapable';
 import { ILayer } from '../..';
 import { TYPES } from '../../types';
-import ICameraService from '../camera/ICameraService';
 import ILayerService from './ILayerService';
 import ILayerStyleService from './ILayerStyleService';
 
@@ -20,9 +19,6 @@ export default class LayerService implements ILayerService {
   };
 
   private layers: ILayer[] = [];
-
-  @inject(TYPES.ICameraService)
-  private readonly camera: ICameraService;
 
   @inject(TYPES.ILayerStyleService)
   private readonly layerStyleService: ILayerStyleService;

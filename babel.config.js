@@ -54,6 +54,11 @@ module.exports = (api) => {
           transform: 'constObject',
         }
       ],
+      // TODO：减少最终打包产物大小
+      // 1. 去除 Shader 中的注释
+      // @see https://www.npmjs.com/package/babel-plugin-remove-glsl-comments
+      // 2. 内联 WebGL 常量
+      // @see https://www.npmjs.com/package/babel-plugin-inline-webgl-constants
     ],
     env: {
       build: {

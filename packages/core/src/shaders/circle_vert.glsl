@@ -1,11 +1,8 @@
 attribute vec4 a_packed_data;
 attribute vec2 a_Position;
 
-uniform mat4 u_ViewMatrix;
-uniform mat4 u_ProjectionMatrix;
 uniform mat4 u_ModelMatrix;
 
-uniform float u_Zoom : 1;
 uniform float u_stroke_width : 2;
 
 varying vec4 v_data;
@@ -45,8 +42,7 @@ void main() {
 
   vec4 project_pos = project_position(vec4(a_Position.xy, 0.0, 1.0));
 
-  // gl_PointSize = 10.0;
-  gl_Position = u_ProjectionMatrix * u_ViewMatrix * vec4(project_pos.xy + offset, 0.0, 1.0);
+  gl_Position = project_common_position_to_clipspace(vec4(project_pos.xy + offset, 0.0, 1.0));
 
   // anti-alias
   float antialiasblur = 1.0 / (radius + u_stroke_width);

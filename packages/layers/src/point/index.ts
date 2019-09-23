@@ -53,8 +53,6 @@ export default class PointLayer extends BaseLayer {
   @lazyInject(TYPES.ILayerStyleService)
   private readonly layerStyleService: ILayerStyleService;
 
-  private model: IModel;
-
   private pointFeatures: IPointFeature[] = [];
 
   public init(): void {
@@ -75,31 +73,33 @@ export default class PointLayer extends BaseLayer {
       createModel,
     } = this.renderer;
 
-    this.model = createModel({
-      attributes: {
-        a_Position: createAttribute({
-          buffer: createBuffer({
-            data: positionBuffer,
-            type: glEnum.FLOAT,
+    this.models.push(
+      createModel({
+        attributes: {
+          a_Position: createAttribute({
+            buffer: createBuffer({
+              data: positionBuffer,
+              type: glEnum.FLOAT,
+            }),
           }),
-        }),
-        a_packed_data: createAttribute({
-          buffer: createBuffer({
-            data: packedBuffer,
-            type: glEnum.FLOAT,
+          a_packed_data: createAttribute({
+            buffer: createBuffer({
+              data: packedBuffer,
+              type: glEnum.FLOAT,
+            }),
           }),
+        },
+        uniforms,
+        fs,
+        vs,
+        count: indexBuffer.length,
+        primitive: glEnum.TRIANGLES,
+        elements: createElements({
+          data: indexBuffer,
+          type: glEnum.UNSIGNED_SHORT,
         }),
-      },
-      uniforms,
-      fs,
-      vs,
-      count: indexBuffer.length,
-      primitive: glEnum.TRIANGLES,
-      elements: createElements({
-        data: indexBuffer,
-        type: glEnum.UNSIGNED_SHORT,
       }),
-    });
+    );
   }
 
   public source({ data }: { data: any }): void {
@@ -119,18 +119,18 @@ export default class PointLayer extends BaseLayer {
   }
 
   public render(): void {
-    this.model.draw({
-      uniforms: {
-        ...this.uniforms,
-        u_ModelMatrix: [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1],
-        u_pixels_per_meter: [1, 1, 1],
-        u_stroke_width: 1,
-        u_blur: 0,
-        u_opacity: 1,
-        u_stroke_color: [1, 1, 1, 1],
-        u_stroke_opacity: 1,
-      },
-    });
+    this.models.forEach((model) =>
+      model.draw({
+        uniforms: {
+          u_ModelMatrix: [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1],
+          u_stroke_width: 1,
+          u_blur: 0,
+          u_opacity: 1,
+          u_stroke_color: [1, 1, 1, 1],
+          u_stroke_opacity: 1,
+        },
+      }),
+    );
   }
 
   private buildPointBuffers(pointFeatures: IPointFeature[]) {

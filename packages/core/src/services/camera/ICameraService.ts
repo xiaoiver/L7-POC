@@ -5,5 +5,13 @@ export default interface ICameraService {
   update(mapCamera: Partial<IMapCamera>): void;
   getProjectionMatrix(): number[];
   getViewMatrix(): number[];
+  getViewMatrixUncentered(): number[];
+  getViewProjectionMatrix(): number[];
   getZoom(): number;
+  getCenter(): [number, number];
+  projectFlat(
+    lngLat: [number, number],
+    scale?: number | undefined,
+  ): [number, number];
+  setViewProjectionMatrix(viewProjectionMatrix: number[] | undefined): void;
 }

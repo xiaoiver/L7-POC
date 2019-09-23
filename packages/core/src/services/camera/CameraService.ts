@@ -9,9 +9,9 @@ import ICameraService from './CameraService';
 export const CameraUniform = {
   ProjectionMatrix: 'u_ProjectionMatrix',
   ViewMatrix: 'u_ViewMatrix',
+  ViewProjectionMatrix: 'u_ViewProjectionMatrix',
   Zoom: 'u_Zoom',
-  PixelsPerMeter: 'u_pixels_per_meter',
-  ProjectionScale: 'u_project_scale',
+  ZoomScale: 'u_ZoomScale',
 };
 
 @injectable()
@@ -22,23 +22,29 @@ export default class CameraService implements ICameraService {
 
   private mapCamera: Partial<IMapCamera>;
 
-  private projectionMatrix: number[];
-
-  private viewMatrix: number[];
-
   private zoom: number;
+
+  private center: [number, number];
+
+  private viewport: WebMercatorViewport;
+
+  private viewProjectionMatrix: number[] | undefined;
 
   public init() {
     //
   }
 
+  /**
+   * 根据相机参数创建视口，包含 VP 矩阵等
+   * @param mapCamera 地图相机
+   */
   public update(mapCamera: Partial<IMapCamera>) {
     this.logger.info('camera updated...');
     this.mapCamera = mapCamera;
 
     const { center, zoom, pitch, bearing, height, width } = mapCamera;
 
-    const viewport = new WebMercatorViewport({
+    this.viewport = new WebMercatorViewport({
       width,
       height,
       longitude: center && center[0],
@@ -48,21 +54,47 @@ export default class CameraService implements ICameraService {
       bearing,
     });
 
-    const { projectionMatrix, viewMatrix } = viewport;
-    this.projectionMatrix = projectionMatrix;
-    this.viewMatrix = viewMatrix;
     this.zoom = zoom as number;
+    this.center = center as [number, number];
   }
 
   public getProjectionMatrix(): number[] {
-    return this.projectionMatrix;
+    return this.viewport.projectionMatrix;
   }
 
   public getViewMatrix(): number[] {
-    return this.viewMatrix;
+    return this.viewport.viewMatrix;
+  }
+
+  public getViewMatrixUncentered(): number[] {
+    // @ts-ignore
+    return this.viewport.viewMatrixUncentered;
+  }
+
+  public getViewProjectionMatrix(): number[] {
+    // @ts-ignore
+    return this.viewProjectionMatrix || this.viewport.viewProjectionMatrix;
   }
 
   public getZoom(): number {
     return this.zoom;
+  }
+
+  public getCenter(): [number, number] {
+    return this.center;
+  }
+
+  public projectFlat(
+    lngLat: [number, number],
+    scale?: number | undefined,
+  ): [number, number] {
+    return this.viewport.projectFlat(lngLat, scale);
+  }
+
+  /**
+   * 支持外部计算 VP 矩阵的场景，例如：在偏移坐标系场景中，需要重新计算 VP 矩阵
+   */
+  public setViewProjectionMatrix(viewProjectionMatrix: number[] | undefined) {
+    this.viewProjectionMatrix = viewProjectionMatrix;
   }
 }
