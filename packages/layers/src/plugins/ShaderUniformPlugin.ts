@@ -27,7 +27,6 @@ export default class ShaderUniformPlugin implements ILayerPlugin {
     layer.hooks.beforeRender.tap('ShaderUniformPlugin', () => {
       // 重新计算坐标系参数
       this.coordinateSystemService.refresh();
-
       layer.models.forEach((model) =>
         model.addUniforms({
           // 相机参数，包含 VP 矩阵、缩放等级

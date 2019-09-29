@@ -28,6 +28,7 @@
     "reflect-metadata": "^0.1.13",
     "tapable": "^2.0.0-beta.8",
     "viewport-mercator-project": "^6.2.1"
+
   },
   "devDependencies": {
     "@types/gl-matrix": "^2.4.5",

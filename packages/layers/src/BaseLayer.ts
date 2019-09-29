@@ -12,17 +12,23 @@ import {
   packCircleVertex,
   TYPES,
 } from '@l7-poc/core';
+import Source from '@l7-poc/source';
+import { isFunction } from 'lodash';
 import { SyncHook } from 'tapable';
+import Base from './core/base';
+import { AttrField, ISourceOption } from './core/interface';
+import Global from './global'
+import DataEncodePlugin from './plugins/dataEncodePlugin';
 import ShaderUniformPlugin from './plugins/ShaderUniformPlugin';
-
-export default class BaseLayer implements ILayer {
+export default class BaseLayer extends Base implements ILayer {
   public styleOptions: ILayerStyleOptions;
   public name: string;
 
   public models: IModel[] = [];
-
+ 
   // 生命周期钩子
   public hooks = {
+    init: new SyncHook(['layer']),
     beforeRender: new SyncHook(['layer']),
     afterRender: new SyncHook(['layer']),
   };
@@ -30,8 +36,18 @@ export default class BaseLayer implements ILayer {
   // 插件集
   public plugins: ILayerPlugin[] = [
     // new CoordinatePlugin(),
+    new DataEncodePlugin(),
     new ShaderUniformPlugin(),
   ];
+  public getDefaultCfg() {
+    return {
+      attrsOption: {},
+      scalesOption: {},
+    };
+  }
+  public prepareRender(): void {
+    throw new Error('Method not implemented.');
+  }
 
   public addPlugin(plugin: ILayerPlugin) {
     // TODO: 控制插件注册顺序
@@ -41,18 +57,46 @@ export default class BaseLayer implements ILayer {
     // });
     this.plugins.push(plugin);
   }
-
   public init(): void {
+    this.hooks.init.call(this);
+    this.prepareRender();
+  }
+  public color(field: AttrField, values: any) {
+    this.createAttrOption('color', field, values, Global.colors);
+    return this;
+  }
+  public size(field: AttrField, values: any) {
+    this.createAttrOption('size', field, values, Global.size);
+    return this;
+  }
+  public shape(field: AttrField, values: any) {
+    this.createAttrOption('shape', field, values, Global.shape);
+    return this;
+  }
+  // public style(options: ILayerStyleOptions) {
+  //   return this;
+  // }
+  public render(): ILayer {
     throw new Error('Method not implemented.');
+  }
+  public source(data: any, options?: ISourceOption) {
+    const source = new Source(data, options);
+    this.set('source', source);
+    return this;
   }
 
-  public style(options: ILayerStyleOptions): void {
-    throw new Error('Method not implemented.');
-  }
-  public render(): void {
-    throw new Error('Method not implemented.');
-  }
-  public source(options: { data: any }): void {
-    throw new Error('Method not implemented.');
+  private createAttrOption(
+    attrName: string,
+    field: AttrField,
+    cfg: any,
+    defaultValues: any,
+  ) {
+    const attrCfg: { [key: string]: any } = {};
+    attrCfg.field = field;
+    if (cfg) {
+      isFunction(cfg) ? (attrCfg.callback = cfg) : (attrCfg.values = cfg);
+    }
+    const options = this.get('attrsOption');
+    options[attrName] = attrCfg;
   }
 }

@@ -1,4 +1,5 @@
 import { djb2hash } from '@l7-poc/utils';
+// @ts-ignore
 import rewind from '@mapbox/geojson-rewind';
 import {
   Feature,
@@ -9,7 +10,7 @@ import {
 } from '@turf/helpers';
 import { getCoords } from '@turf/invariant';
 import * as turfMeta from '@turf/meta';
-import { IFeatureKey, IParserData } from '../interface';
+import { IFeatureKey, IParseDataItem, IParserData } from '../interface';
 interface IGeoJSON {
   features: object[];
 }
@@ -19,10 +20,10 @@ interface IParserCFG {
 }
 export default function geoJSON(
   data: FeatureCollection<Geometries, Properties>,
-  cfg: IParserCFG,
+  cfg?: IParserCFG,
 ): IParserData {
   rewind(data, true); // 设置地理多边形方向 If clockwise is true, the outer ring is clockwise, otherwise it is counterclockwise.
-  const resultData: object[] = [];
+  const resultData: IParseDataItem[] = [];
   const featureKeys: IFeatureKey = {};
   data.features = data.features.filter((item: Feature) => {
     const geometry: Geometry | null = item.geometry as Geometry;
@@ -44,6 +45,7 @@ export default function geoJSON(
       let id = featureIndex;
       // 瓦片数据通过字段hash建立索引
       if (
+        cfg &&
         cfg.idField &&
         currentFeature.properties &&
         currentFeature.properties[cfg.idField]
@@ -55,7 +57,7 @@ export default function geoJSON(
           idField: value,
         };
       }
-      const dataItem = {
+      const dataItem: IParseDataItem = {
         ...currentFeature.properties,
         coordinates: coord,
         _id: id,

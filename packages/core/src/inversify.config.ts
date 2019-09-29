@@ -62,7 +62,6 @@ container
 container
   .bind<IShaderModuleService>(TYPES.IShaderModuleService)
   .to(ShaderModuleService);
-
 // @see https://github.com/inversify/InversifyJS/blob/master/wiki/inheritance.md#what-can-i-do-when-my-base-class-is-provided-by-a-third-party-module
 decorate(injectable(), EventEmitter);
 activateLogging(container);

@@ -1,6 +1,5 @@
 export type DataType = string | object[] | object;
 export interface ISourceCFG {
-  data: DataType;
   parser?: object;
   transfroms?: object;
 }
@@ -16,7 +15,7 @@ export interface IFeatureKey {
 // 解析后返回数据类型
 export interface IParseDataItem {
   coordinates: any[];
-  id: number;
+  _id: number;
   [key: string]: any;
 }
 export interface IParserData {

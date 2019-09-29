@@ -9,12 +9,13 @@ export default class Source extends EventEmitter {
 
   // 数据范围
   public extent: BBox;
-  private attrs: IDictionary<any>;
+  private attrs: IDictionary<any> = {};
 
   // 原始数据
   private originData: any;
-  constructor(cfg: ISourceCFG) {
+  constructor(data: any, cfg?: ISourceCFG) {
     super();
+    this.set('data', data);
     Object.assign(this.attrs, cfg);
     this.originData = cloneDeep(this.get('data'));
     this.init();
@@ -28,7 +29,7 @@ export default class Source extends EventEmitter {
   }
   private excuteParser(): void {
     const parser = this.get('parser');
-    const type: string = parser.type || 'geojson';
+    // const type: string = parser.type || 'geojson';
     this.data = geojson(this.originData, parser);
     // 计算范围
     this.extent = extent(this.data.dataArray);

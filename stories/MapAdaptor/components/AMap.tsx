@@ -16,10 +16,8 @@ export default class AMap extends React.Component {
       type: 'amap',
       zoom: 1,
     });
-    const pointLayer = new PointLayer();
-    pointLayer.source({
-      data: await response.json(),
-    });
+    const pointLayer = new PointLayer({});
+    pointLayer.source(await response.json());
     scene.addLayer(pointLayer);
     scene.render();
   }
