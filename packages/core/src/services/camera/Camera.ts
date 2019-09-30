@@ -2,13 +2,13 @@ import { mat3, mat4, quat, vec3, vec4 } from 'gl-matrix';
 import { createVec3, getAngle } from '../../utils/math';
 // import Landmark from './Landmark';
 
-export const enum CAMERA_TYPE {
+export enum CAMERA_TYPE {
   ORBITING = 'ORBITING',
   EXPLORING = 'EXPLORING',
   TRACKING = 'TRACKING',
 }
 
-export const enum CAMERA_TRACKING_MODE {
+export enum CAMERA_TRACKING_MODE {
   DEFAULT = 'DEFAULT',
   ROTATIONAL = 'ROTATIONAL',
   TRANSLATIONAL = 'TRANSLATIONAL',

@@ -13,6 +13,14 @@ export interface IElementsInitializationOptions {
    */
   type?: glEnum.UNSIGNED_BYTE | glEnum.UNSIGNED_SHORT | glEnum.UNSIGNED_INT;
   length?: number;
+  primitive?:
+    | glEnum.POINTS
+    | glEnum.LINES
+    | glEnum.LINE_STRIP
+    | glEnum.LINE_LOOP
+    | glEnum.TRIANGLES
+    | glEnum.TRIANGLE_STRIP
+    | glEnum.TRIANGLE_FAN;
 }
 
 export default interface IElements {

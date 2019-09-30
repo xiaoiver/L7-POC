@@ -74,7 +74,6 @@ export default class ReglModel implements IModel {
     if (elements) {
       drawParams.elements = (elements as ReglElements).get();
     }
-
     this.drawCommand = this.gl(drawParams);
   }
 

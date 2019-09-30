@@ -1,7 +1,13 @@
 import { glEnum } from './glenum';
 
 export interface IBufferInitializationOptions {
-  data: number[] | number[][] | Uint8Array | Uint16Array | Uint32Array;
+  data:
+    | number[]
+    | number[][]
+    | Uint8Array
+    | Uint16Array
+    | Uint32Array
+    | Float32Array;
 
   /**
    * gl.DRAW_STATIC | gl.DYNAMIC_DRAW | gl.STREAM_DRAW

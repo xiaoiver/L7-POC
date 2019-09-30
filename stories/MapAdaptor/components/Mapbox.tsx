@@ -18,7 +18,7 @@ export default class Mapbox extends React.Component {
 
   public async componentDidMount() {
     const response = await fetch(
-      'https://d2ad6b4ur7yvpq.cloudfront.net/naturalearth-3.3.0/ne_10m_geography_regions_points.geojson',
+      'https://gw.alipayobjects.com/os/basement_prod/d3564b06-670f-46ea-8edb-842f7010a7c6.json',
     );
     const scene = new Scene({
       id: 'map',
@@ -28,13 +28,22 @@ export default class Mapbox extends React.Component {
       pitch: 0,
       zoom: 1,
     });
-    const pointLayer = new PointLayer();
+    const pointLayer = new PointLayer({});
 
     // TODO: new GeoJSONSource()
-    pointLayer.source({
-      data: await response.json(),
-    });
+    pointLayer
+      .source(await response.json())
+      .size('mag', [2, 10])
+      .color('mag', [
+        '#2E8AE6',
+        '#69D1AB',
+        '#DAF291',
+        '#FFD591',
+        '#FF7A45',
+        '#CF1D49',
+      ]);
     scene.addLayer(pointLayer);
+    console.log(pointLayer);
     scene.render();
 
     /*** 运行时修改样式属性 ***/

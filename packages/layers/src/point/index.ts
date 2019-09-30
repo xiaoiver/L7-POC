@@ -12,7 +12,7 @@ import {
   TYPES,
 } from '@l7-poc/core';
 import { featureEach } from '@turf/meta';
-import { BaseLayer } from '..';
+import BaseLayer from '../core/baseLayer';
 
 export interface IPointLayerStyleOptions extends ILayerStyleOptions {
   pointShape: string;
@@ -25,7 +25,8 @@ export interface IPointLayerStyleOptions extends ILayerStyleOptions {
 }
 
 interface IPointFeature {
-  coordinates: [number, number];
+  coordinates: [number, number] | [number, number];
+  [key: string]: any;
 }
 
 /**
@@ -55,8 +56,10 @@ export default class PointLayer extends BaseLayer {
 
   private pointFeatures: IPointFeature[] = [];
 
-  public init(): void {
+  public prepareRender(): void {
     const { vs, fs, uniforms } = this.shaderModule.getModule('circle');
+    const source = this.get('source');
+    const dataArray = source.data.dataArray;
 
     const {
       packedBuffer,
@@ -64,7 +67,7 @@ export default class PointLayer extends BaseLayer {
       packedBuffer3,
       indexBuffer,
       positionBuffer,
-    } = this.buildPointBuffers(this.pointFeatures);
+    } = this.buildPointBuffers(dataArray);
 
     const {
       createAttribute,
@@ -102,15 +105,16 @@ export default class PointLayer extends BaseLayer {
     );
   }
 
-  public source({ data }: { data: any }): void {
-    featureEach(data, ({ geometry: { coordinates }, properties }) => {
-      this.pointFeatures.push({
-        coordinates,
-      });
-    });
-  }
+  // public source({ data }: { data: any }) {
+  //   featureEach(data, ({ geometry: { coordinates }, properties }) => {
+  //     this.pointFeatures.push({
+  //       coordinates,
+  //     });
+  //   });
+  //   return this;
+  // }
 
-  public style(options: Partial<IPointLayerStyleOptions>): void {
+  public style(options: Partial<IPointLayerStyleOptions>) {
     // this.layerStyleService.update(options);
     // this.styleOptions = {
     //   ...this.styleOptions,
@@ -118,7 +122,7 @@ export default class PointLayer extends BaseLayer {
     // };
   }
 
-  public render(): void {
+  public render() {
     this.models.forEach((model) =>
       model.draw({
         uniforms: {
@@ -131,6 +135,7 @@ export default class PointLayer extends BaseLayer {
         },
       }),
     );
+    return this;
   }
 
   private buildPointBuffers(pointFeatures: IPointFeature[]) {

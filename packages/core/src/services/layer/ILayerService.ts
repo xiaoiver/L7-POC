@@ -1,20 +1,38 @@
+import { ISourceCFG } from '@l7-poc/source';
 import { AsyncParallelHook, SyncHook } from 'tapable';
 import IModel from '../renderer/IModel';
 import { ILayerStyleOptions } from './ILayerStyleService';
 
 export interface ILayer {
-  styleOptions: ILayerStyleOptions;
   name: string;
+  // visible: boolean;
+  // zIndex: number;
+  // type: string;
+  // id: number;
+  styleOptions: ILayerStyleOptions;
   plugins: ILayerPlugin[];
   hooks: {
+    init: SyncHook<unknown>;
     beforeRender: SyncHook<unknown>;
     afterRender: SyncHook<unknown>;
   };
   models: IModel[];
   init(): void;
-  style(options: ILayerStyleOptions): void;
-  render(): void;
-  source(options: { data: any }): void;
+  get(name: string): any;
+  set(name: string, value: any): any;
+  // size(field: string, value: AttrOption): ILayer;
+  // color(field: string, value: AttrOption): ILayer;
+  // shape(field: string, value: AttrOption): ILayer;
+  // pattern(field: string, value: AttrOption): ILayer;
+  // filter(field: string, value: AttrOption): ILayer;
+  // active(option: ActiveOption): ILayer;
+  // style(options: ILayerStyleOptions): ILayer;
+  // hide(): ILayer;
+  // show(): ILayer;
+  // animate(field: string, option: any): ILayer;
+  prepareRender(): void;
+  render(): any;
+  source(data: any, option?: ISourceCFG): any;
   addPlugin(plugin: ILayerPlugin): void;
 }
 
