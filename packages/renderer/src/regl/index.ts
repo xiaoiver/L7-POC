@@ -33,14 +33,15 @@ export default class ReglRendererService implements IRendererService {
     this.gl = await new Promise((resolve, reject) => {
       regl({
         container: $container,
-        // extensions: [
-        //   'EXT_shader_texture_lod', // IBL
-        //   'OES_standard_derivatives', // wireframe
-        //   'EXT_SRGB', // baseColor emmisive
-        //   'OES_texture_float', // shadow map
-        //   'WEBGL_depth_texture',
-        //   'EXT_texture_filter_anisotropic' // VSM shadow map
-        // ],
+        extensions: [
+          'OES_element_index_uint',
+          // 'EXT_shader_texture_lod', // IBL
+          // 'OES_standard_derivatives', // wireframe
+          // 'EXT_SRGB', // baseColor emmisive
+          // 'OES_texture_float', // shadow map
+          // 'WEBGL_depth_texture',
+          // 'EXT_texture_filter_anisotropic' // VSM shadow map
+        ],
         // optionalExtensions: ['oes_texture_float_linear'],
         // profile: true,
         onDone: (err: Error | null, r?: regl.Regl | undefined): void => {

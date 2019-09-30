@@ -12,7 +12,7 @@ import {
   TYPES,
 } from '@l7-poc/core';
 import { featureEach } from '@turf/meta';
-import { BaseLayer } from '..';
+import BaseLayer from '../core/baseLayer';
 
 export interface IPointLayerStyleOptions extends ILayerStyleOptions {
   pointShape: string;

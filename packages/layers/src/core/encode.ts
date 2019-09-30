@@ -1,6 +1,7 @@
 import Attribute from '@l7-poc/attr';
 import { ILayer } from '@l7-poc/core';
 import { isString } from 'lodash';
+import { rgb2arr } from '../utils/color';
 import { IAttrOption, ILayerData } from './interface';
 import ScaleController from './scale';
 
@@ -48,6 +49,7 @@ export default class Encode {
         scales.push(scale);
       }
     }
+    option.type = type;
     option.scales = scales;
 
     attrs[type] = new Attribute(option);
@@ -80,8 +82,14 @@ export default class Encode {
       for (const k in attrs) {
         if (attrs.hasOwnProperty(k)) {
           const attr = attrs[k];
-          const values = this.getAttrValue(attr, record);
-          encodeRecord[k] = values;
+          let values = this.getAttrValue(attr, record);
+          if (k === 'color') {
+            values = values.map((c: string) => {
+              return rgb2arr(c);
+            });
+          }
+          encodeRecord[k] =
+            Array.isArray(values) && values.length === 1 ? values[0] : values;
         }
       }
       return encodeRecord;
@@ -95,7 +103,9 @@ export default class Encode {
       if (scales.hasOwnProperty(i)) {
         const scale = scales[i];
         const field = scale.field;
-        params.push(record[field]);
+        if (record[field]) {
+          params.push(record[field]);
+        }
       }
     }
     return attr.mapping(...params);

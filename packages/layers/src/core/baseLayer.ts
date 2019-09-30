@@ -12,20 +12,19 @@ import {
   packCircleVertex,
   TYPES,
 } from '@l7-poc/core';
-import Source from '@l7-poc/source';
+import Source, { ISourceCFG } from '@l7-poc/source';
 import { isFunction } from 'lodash';
 import { SyncHook } from 'tapable';
-import Base from './core/base';
-import { AttrField, ISourceOption } from './core/interface';
-import Global from './global'
-import DataEncodePlugin from './plugins/dataEncodePlugin';
-import ShaderUniformPlugin from './plugins/ShaderUniformPlugin';
+import Global from '../global';
+import DataEncodePlugin from '../plugins/dataEncodePlugin';
+import ShaderUniformPlugin from '../plugins/ShaderUniformPlugin';
+import Base from './base';
+import { AttrField } from './interface';
 export default class BaseLayer extends Base implements ILayer {
   public styleOptions: ILayerStyleOptions;
   public name: string;
 
   public models: IModel[] = [];
- 
   // 生命周期钩子
   public hooks = {
     init: new SyncHook(['layer']),
@@ -61,15 +60,15 @@ export default class BaseLayer extends Base implements ILayer {
     this.hooks.init.call(this);
     this.prepareRender();
   }
-  public color(field: AttrField, values: any) {
+  public color(field: AttrField, values?: any) {
     this.createAttrOption('color', field, values, Global.colors);
     return this;
   }
-  public size(field: AttrField, values: any) {
+  public size(field: AttrField, values?: any) {
     this.createAttrOption('size', field, values, Global.size);
     return this;
   }
-  public shape(field: AttrField, values: any) {
+  public shape(field: AttrField, values?: any) {
     this.createAttrOption('shape', field, values, Global.shape);
     return this;
   }
@@ -79,7 +78,7 @@ export default class BaseLayer extends Base implements ILayer {
   public render(): ILayer {
     throw new Error('Method not implemented.');
   }
-  public source(data: any, options?: ISourceOption) {
+  public source(data: any, options?: ISourceCFG) {
     const source = new Source(data, options);
     this.set('source', source);
     return this;

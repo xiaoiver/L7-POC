@@ -11,10 +11,12 @@ describe('parser.geojson', () => {
       idField: 'name',
     });
     expect(result.dataArray.length).toEqual(3);
-    expect(Object.keys(result.featureKeys)).toEqual([
-      '408534',
-      '410464',
-      '431974',
-    ]);
+    if (result.featureKeys) {
+      expect(Object.keys(result.featureKeys)).toEqual([
+        '408534',
+        '410464',
+        '431974',
+      ]);
+    }
   });
 });

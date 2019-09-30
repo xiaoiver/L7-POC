@@ -1,7 +1,7 @@
+import { ISourceCFG } from '@l7-poc/source';
 import { AsyncParallelHook, SyncHook } from 'tapable';
 import IModel from '../renderer/IModel';
 import { ILayerStyleOptions } from './ILayerStyleService';
-import { ActiveOption, AttrOption, ISourceOption } from './interface';
 
 export interface ILayer {
   name: string;
@@ -32,7 +32,7 @@ export interface ILayer {
   // animate(field: string, option: any): ILayer;
   prepareRender(): void;
   render(): any;
-  source(data: any, option?: ISourceOption): any;
+  source(data: any, option?: ISourceCFG): any;
   addPlugin(plugin: ILayerPlugin): void;
 }
 

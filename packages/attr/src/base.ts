@@ -48,7 +48,8 @@ export default class Attribute {
     }
     return params.map((param, idx) => {
       const scale = this.scales[idx];
-      return scale.scale(param);
+      const value = scale.scale(param);
+      return value;
     });
   }
 }

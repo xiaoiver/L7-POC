@@ -8,6 +8,7 @@ export interface ILayerData {
 }
 export type AttrField = string | string[];
 export interface IAttrOption {
+  type: string;
   names?: string[];
   field: AttrField;
   values?: any[];

@@ -8,6 +8,8 @@ import IShaderModuleService, { IModuleParams } from './IShaderModuleService';
 import circleFrag from '../../shaders/circle_frag.glsl';
 import circleVert from '../../shaders/circle_vert.glsl';
 import decode from '../../shaders/decode.glsl';
+import polygon_frag from '../../shaders/polygon_frag.glsl';
+import polygon_vert from '../../shaders/polygon_vert.glsl';
 import projection from '../../shaders/projection.glsl';
 import sdf2d from '../../shaders/sdf_2d.glsl';
 
@@ -29,6 +31,7 @@ export default class ShaderModuleService implements IShaderModuleService {
     this.registerModule('projection', { vs: projection, fs: '' });
     this.registerModule('sdf_2d', { vs: '', fs: sdf2d });
     this.registerModule('circle', { vs: circleVert, fs: circleFrag });
+    this.registerModule('polygon', { vs: polygon_vert, fs: polygon_frag });
 
     this.logger.info('builtin modules compiled');
   }

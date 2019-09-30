@@ -60,10 +60,10 @@ export default class ScaleController {
       return scale;
     }
     let firstValue = null;
-    data.forEach((item) => {
+    data.some((item) => {
       if (!isNil(item[field])) {
         firstValue = item[field];
-        return;
+        return true;
       }
       firstValue = null;
     });

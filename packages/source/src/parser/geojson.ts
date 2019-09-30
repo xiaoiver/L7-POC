@@ -38,7 +38,7 @@ export default function geoJSON(
   // 数据为空时处理
   let i = 0;
   // multi polygon 拆分
-  turfMeta.featureEach(
+  turfMeta.flattenEach(
     data,
     (currentFeature: Feature<Geometries, Properties>, featureIndex: number) => {
       const coord = getCoords(currentFeature);
@@ -65,7 +65,6 @@ export default function geoJSON(
       resultData.push(dataItem);
     },
   );
-
   return {
     dataArray: resultData,
     featureKeys,

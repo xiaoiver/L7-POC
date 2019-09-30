@@ -2,8 +2,8 @@ import { extent } from '@l7-poc/utils';
 import { BBox, FeatureCollection, Geometries, Properties } from '@turf/helpers';
 import { EventEmitter } from 'eventemitter3';
 import { cloneDeep } from 'lodash';
+import { getParser } from './';
 import { IDictionary, IParserData, ISourceCFG } from './interface';
-import { geojson } from './parser';
 export default class Source extends EventEmitter {
   public data: IParserData;
 
@@ -28,9 +28,10 @@ export default class Source extends EventEmitter {
     this.attrs[name] = value;
   }
   private excuteParser(): void {
-    const parser = this.get('parser');
-    // const type: string = parser.type || 'geojson';
-    this.data = geojson(this.originData, parser);
+    const parser = this.get('parser') || {};
+    const type: string = parser.type || 'geojson';
+    const sourceParser = getParser(type);
+    this.data = sourceParser(this.originData, parser);
     // 计算范围
     this.extent = extent(this.data.dataArray);
   }

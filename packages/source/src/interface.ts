@@ -1,7 +1,23 @@
 export type DataType = string | object[] | object;
+export interface IParserCfg {
+  type: string;
+  x?: string;
+  y?: string;
+  x1?: string;
+  y1?: string;
+  coordinates?: string;
+  [key: string]: any;
+}
+type CallBack = (...args: any[]) => any;
+export interface ITransform {
+  type: string;
+  [key: string]: any;
+  callback: CallBack;
+}
+
 export interface ISourceCFG {
-  parser?: object;
-  transfroms?: object;
+  parser?: IParserCfg;
+  transforms?: ITransform[];
 }
 export interface IDictionary<TValue> {
   [key: string]: TValue;
@@ -19,6 +35,12 @@ export interface IParseDataItem {
   [key: string]: any;
 }
 export interface IParserData {
+  [key: string]: any;
   dataArray: IParseDataItem[];
-  featureKeys: IFeatureKey;
+  // 瓦片地图数据字典
+  featureKeys?: IFeatureKey;
 }
+export interface IJsonItem {
+  [key: string]: any;
+}
+export type IJsonData = IJsonItem[];

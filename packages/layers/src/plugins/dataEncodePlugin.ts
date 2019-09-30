@@ -14,7 +14,7 @@ export default class DataEncodePlugin implements ILayerPlugin {
     layer.hooks.init.tap('DataEndodePlugin', () => {
       // 重新计算坐标系参
       const dataEncode = new Encode(layer);
-      console.log(dataEncode);
+      layer.set('encode', dataEncode);
       // TODO：脏检查，决定是否需要渲染
     });
   }

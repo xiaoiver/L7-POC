@@ -19,6 +19,7 @@
   "author": "xiaoiver",
   "license": "ISC",
   "dependencies": {
+    "@l7-poc/source": "0.0.1",
     "eventemitter3": "^3.1.0",
     "gl-matrix": "^3.1.0",
     "inversify": "^5.0.1",

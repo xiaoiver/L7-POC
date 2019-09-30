@@ -13,13 +13,12 @@ export default class ReglAttribute implements IAttribute {
     this.gl = gl;
 
     const { buffer, offset, stride, normalized, size, divisor } = options;
-
     this.attribute = {
       buffer: (buffer as ReglBuffer).get(),
       // offset: offset || 0,
-      // stride: stride || 0,
+      stride: stride || 0,
       // normalized: normalized || false,
-      // size: size || 4,
+      size: size || 4,
       // divisor: divisor || 0,
     };
   }
