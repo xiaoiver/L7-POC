@@ -5,7 +5,7 @@
  * @see https://github.com/uber/deck.gl/blob/7.1-release/dev-docs/roadmaps/dist-size-roadmap.md#inline-gl-constants
  */
 
-export enum glEnum {
+export enum gl {
   /* ClearBufferMask */
   DEPTH_BUFFER_BIT = 0x00000100,
   STENCIL_BUFFER_BIT = 0x00000400,

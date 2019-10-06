@@ -1,23 +1,38 @@
 /**
- * AMapService
+ * MapboxService
  */
-import { IMapCamera, IMapConfig, IMapService } from '@l7-poc/core';
+import {
+  CoordinateSystem,
+  ICoordinateSystemService,
+  IMapConfig,
+  IMapService,
+  IViewport,
+  TYPES,
+} from '@l7-poc/core';
 import { inject, injectable } from 'inversify';
 import mapboxgl from 'mapbox-gl';
+import Viewport from './Viewport';
 
 mapboxgl.accessToken =
   'pk.eyJ1IjoieGlhb2l2ZXIiLCJhIjoiY2pxcmc5OGNkMDY3cjQzbG42cXk5NTl3YiJ9.hUC5Chlqzzh0FFd_aEc-uQ';
+const LNGLAT_OFFSET_ZOOM_THRESHOLD = 12;
 
 /**
  * AMapService
  */
 @injectable()
 export default class MapboxService implements IMapService {
+  @inject(TYPES.ICoordinateSystemService)
+  private readonly coordinateSystemService: ICoordinateSystemService;
+
   private map: IMapboxInstance;
-  private cameraChangedCallback: (camera: Partial<IMapCamera>) => void;
+  private viewport: Viewport;
+  private cameraChangedCallback: (viewport: IViewport) => void;
 
   public async init(mapConfig: IMapConfig): Promise<void> {
     const { id, ...rest } = mapConfig;
+
+    this.viewport = new Viewport();
 
     /**
      * TODO: 使用 mapbox v0.53.x 版本 custom layer，需要共享 gl context
@@ -41,22 +56,35 @@ export default class MapboxService implements IMapService {
     document.head.appendChild($link);
   }
 
-  public onCameraChanged(
-    callback: (camera: Partial<IMapCamera>) => void,
-  ): void {
+  public onCameraChanged(callback: (viewport: IViewport) => void): void {
     this.cameraChangedCallback = callback;
   }
 
   private handleCameraChanged = () => {
     // @see https://github.com/mapbox/mapbox-gl-js/issues/2572
     const { lat, lng } = this.map.getCenter().wrap();
-    this.cameraChangedCallback({
+
+    // resync
+    this.viewport.syncWithMapCamera({
       bearing: this.map.getBearing(),
       center: [lng, lat],
-      height: this.map.transform.height,
+      viewportHeight: this.map.transform.height,
       pitch: this.map.getPitch(),
-      width: this.map.transform.width,
+      viewportWidth: this.map.transform.width,
       zoom: this.map.getZoom(),
+      // mapbox 中固定相机高度为 viewport 高度的 1.5 倍
+      cameraHeight: 0,
     });
+
+    // set coordinate system
+    if (this.viewport.getZoom() > LNGLAT_OFFSET_ZOOM_THRESHOLD) {
+      this.coordinateSystemService.setCoordinateSystem(
+        CoordinateSystem.LNGLAT_OFFSET,
+      );
+    } else {
+      this.coordinateSystemService.setCoordinateSystem(CoordinateSystem.LNGLAT);
+    }
+
+    this.cameraChangedCallback(this.viewport);
   };
 }

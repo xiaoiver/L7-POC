@@ -1,6 +1,8 @@
+import { IViewport } from '../camera/ICameraService';
+
 export default interface IMapService {
   init(config: Partial<IMapConfig>): void;
-  onCameraChanged(callback: (camera: Partial<IMapCamera>) => void): void;
+  onCameraChanged(callback: (viewport: IViewport) => void): void;
 }
 
 export enum MapType {
@@ -57,8 +59,8 @@ export interface IMapCamera {
   near: number;
   far: number;
 
-  width: number;
-  height: number;
+  viewportWidth: number;
+  viewportHeight: number;
 
   // 地图相机特有参数
   // @see https://docs.mapbox.com/mapbox-gl-js/api/#map
@@ -66,4 +68,8 @@ export interface IMapCamera {
   bearing: number;
   zoom: number;
   center: [number, number];
+  // 相机高度
+  cameraHeight: number;
+  // 偏移原点，例如 P20 坐标系下
+  offsetOrigin: [number, number];
 }

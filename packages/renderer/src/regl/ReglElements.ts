@@ -1,8 +1,4 @@
-import {
-  glEnum,
-  IElements,
-  IElementsInitializationOptions,
-} from '@l7-poc/core';
+import { gl, IElements, IElementsInitializationOptions } from '@l7-poc/core';
 import regl from 'regl';
 import { dataTypeMap, usageMap } from './constants';
 
@@ -10,18 +6,15 @@ import { dataTypeMap, usageMap } from './constants';
  * @see https://github.com/regl-project/regl/blob/gh-pages/API.md#elements
  */
 export default class ReglElements implements IElements {
-  private gl: regl.Regl;
   private elements: regl.Elements;
 
-  constructor(gl: regl.Regl, options: IElementsInitializationOptions) {
-    this.gl = gl;
-
+  constructor(reGl: regl.Regl, options: IElementsInitializationOptions) {
     const { data, usage, type } = options;
 
-    this.elements = this.gl.elements({
+    this.elements = reGl.elements({
       data,
-      usage: usageMap[usage || glEnum.STATIC_DRAW],
-      type: dataTypeMap[type || glEnum.UNSIGNED_BYTE] as
+      usage: usageMap[usage || gl.STATIC_DRAW],
+      type: dataTypeMap[type || gl.UNSIGNED_BYTE] as
         | 'uint8'
         | 'uint16'
         | 'uint32',

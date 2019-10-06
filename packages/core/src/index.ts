@@ -1,8 +1,8 @@
 import container, { lazyInject } from './inversify.config';
 import { CameraUniform } from './services/camera/CameraService';
-import ICameraService from './services/camera/ICameraService';
+import ICameraService, { IViewport } from './services/camera/ICameraService';
 import { CoordinateUniform } from './services/coordinate/CoordinateSystemService';
-import ICoordinateSystemService from './services/coordinate/ICoordinateSystemService';
+import ICoordinateSystemService, { CoordinateSystem } from './services/coordinate/ICoordinateSystemService';
 import { ILayer, ILayerPlugin } from './services/layer/ILayerService';
 import ILayerStyleService, {
   ILayerStyleOptions,
@@ -12,7 +12,7 @@ import IMapService, {
   IMapConfig,
   MapType,
 } from './services/map/IMapService';
-import { glEnum } from './services/renderer/glenum';
+import { gl } from './services/renderer/gl';
 import IAttribute, {
   IAttributeInitializationOptions,
 } from './services/renderer/IAttribute';
@@ -22,11 +22,30 @@ import IBuffer, {
 import IElements, {
   IElementsInitializationOptions,
 } from './services/renderer/IElements';
+import IFramebuffer, {
+  IFramebufferInitializationOptions,
+} from './services/renderer/IFramebuffer';
 import IModel, {
   IModelDrawOptions,
   IModelInitializationOptions,
 } from './services/renderer/IModel';
-import IRendererService from './services/renderer/IRendererService';
+import IMultiPassRenderer, {
+  IPass,
+  IPostProcessingPass,
+  IPostProcessor,
+  PassType,
+} from './services/renderer/IMultiPassRenderer';
+import IRenderbuffer, {
+  IRenderbufferInitializationOptions,
+} from './services/renderer/IRenderbuffer';
+import IRendererService, {
+  IClearOptions,
+  IRenderConfig,
+} from './services/renderer/IRendererService';
+import ITexture2D, {
+  ITexture2DInitializationOptions,
+} from './services/renderer/ITexture2D';
+import { IUniform } from './services/renderer/IUniform';
 import ISceneService from './services/scene/ISceneService';
 import SceneService from './services/scene/SceneService';
 import IShaderModuleService from './services/shader/IShaderModuleService';
@@ -56,7 +75,9 @@ export {
    * 各个 Service 接口
    */
   ICameraService,
+  IViewport,
   ICoordinateSystemService,
+  CoordinateSystem,
   ISceneService,
   SceneService,
   IMapService,
@@ -67,16 +88,31 @@ export {
   ILayerStyleService,
   ILayerStyleOptions,
   IShaderModuleService,
+  /** render 相关 */
+  IRenderConfig,
   IRendererService,
-  IModel,
-  IModelDrawOptions,
-  IModelInitializationOptions,
-  packCircleVertex,
+  IClearOptions,
   IAttribute,
   IAttributeInitializationOptions,
   IElements,
   IElementsInitializationOptions,
   IBuffer,
   IBufferInitializationOptions,
-  glEnum,
+  IUniform,
+  IModel,
+  IModelDrawOptions,
+  IModelInitializationOptions,
+  IFramebuffer,
+  IFramebufferInitializationOptions,
+  ITexture2D,
+  ITexture2DInitializationOptions,
+  IRenderbuffer,
+  IRenderbufferInitializationOptions,
+  IPass,
+  PassType,
+  IMultiPassRenderer,
+  IPostProcessor,
+  IPostProcessingPass,
+  packCircleVertex,
+  gl,
 };

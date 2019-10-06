@@ -3,15 +3,17 @@
  * @see https://github.com/regl-project/regl/blob/gh-pages/API.md
  */
 import {
-  glEnum,
+  gl,
   IAttribute,
   IAttributeInitializationOptions,
   IBuffer,
   IBufferInitializationOptions,
+  IClearOptions,
   IElements,
   IElementsInitializationOptions,
   IModel,
   IModelInitializationOptions,
+  IMultiPassRenderer,
   IRendererService,
 } from '@l7-poc/core';
 import { inject, injectable } from 'inversify';
@@ -19,7 +21,9 @@ import regl from 'regl';
 import ReglAttribute from './ReglAttribute';
 import ReglBuffer from './ReglBuffer';
 import ReglElements from './ReglElements';
+import ReglFramebuffer from './ReglFramebuffer';
 import ReglModel from './ReglModel';
+import ReglMultiPassRenderer from './ReglMultiPassRenderer';
 
 /**
  * regl renderer
@@ -28,20 +32,30 @@ import ReglModel from './ReglModel';
 export default class ReglRendererService implements IRendererService {
   private gl: regl.Regl;
 
+  private multiPassRenderer: IMultiPassRenderer;
+
   public async init($container: HTMLDivElement): Promise<void> {
     // tslint:disable-next-line:typedef
     this.gl = await new Promise((resolve, reject) => {
       regl({
         container: $container,
-        // extensions: [
-        //   'EXT_shader_texture_lod', // IBL
-        //   'OES_standard_derivatives', // wireframe
-        //   'EXT_SRGB', // baseColor emmisive
-        //   'OES_texture_float', // shadow map
-        //   'WEBGL_depth_texture',
-        //   'EXT_texture_filter_anisotropic' // VSM shadow map
-        // ],
-        // optionalExtensions: ['oes_texture_float_linear'],
+        attributes: {
+          alpha: true,
+          // use TAA instead of MSAA
+          // @see https://www.khronos.org/registry/webgl/specs/1.0/#5.2.1
+          antialias: false,
+          premultipliedAlpha: true,
+        },
+        // TODO: use extensions
+        extensions: [
+          'EXT_shader_texture_lod', // IBL
+          'OES_standard_derivatives', // wireframe
+          'EXT_SRGB', // baseColor emmisive
+          'OES_texture_float', // shadow map
+          'WEBGL_depth_texture',
+          'EXT_texture_filter_anisotropic', // VSM shadow map
+        ],
+        optionalExtensions: ['oes_texture_float_linear'],
         // profile: true,
         onDone: (err: Error | null, r?: regl.Regl | undefined): void => {
           if (err || !r) {
@@ -51,6 +65,9 @@ export default class ReglRendererService implements IRendererService {
         },
       });
     });
+
+    // TODO: toggle it by config
+    this.multiPassRenderer = new ReglMultiPassRenderer(this.gl);
   }
 
   public createModel = (options: IModelInitializationOptions): IModel => {
@@ -72,4 +89,49 @@ export default class ReglRendererService implements IRendererService {
   ): IElements => {
     return new ReglElements(this.gl, options);
   };
+
+  public clear(options: IClearOptions) {
+    // @see https://github.com/regl-project/regl/blob/gh-pages/API.md#clear-the-draw-buffer
+    const { color, depth, stencil, framebuffer = null } = options;
+    const reglClearOptions: regl.ClearOptions = {
+      color,
+      depth,
+      stencil,
+    };
+
+    reglClearOptions.framebuffer =
+      framebuffer === null
+        ? framebuffer
+        : (framebuffer as ReglFramebuffer).get();
+
+    this.gl.clear(reglClearOptions);
+  }
+
+  public getMultiPassRenderer(): IMultiPassRenderer {
+    return this.multiPassRenderer;
+  }
+
+  public viewport({
+    x,
+    y,
+    width,
+    height,
+  }: {
+    x: number;
+    y: number;
+    width: number;
+    height: number;
+  }) {
+    // use WebGL context directly
+    // @see https://github.com/regl-project/regl/blob/gh-pages/API.md#unsafe-escape-hatch
+    this.gl._gl.viewport(x, y, width, height);
+    this.gl._refresh();
+  }
+
+  public getViewportSize() {
+    return {
+      width: this.gl._gl.drawingBufferWidth,
+      height: this.gl._gl.drawingBufferHeight,
+    };
+  }
 }

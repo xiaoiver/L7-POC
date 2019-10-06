@@ -11,12 +11,14 @@ interface IAMapEvent {
     pitch: number; 
     rotation: number; 
     aspect: number;
+    position: {x: number; y: number;};
   }
 }
 
 interface IAMapInstance {
   on(eventName: string, handler: (event: IAMapEvent) => void): void;
   getZoom(): number;
+  getCenter(): {lat: number; lng: number};
 }
 
 interface IMapboxInstance {

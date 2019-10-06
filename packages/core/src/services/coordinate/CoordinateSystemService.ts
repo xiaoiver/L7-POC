@@ -1,14 +1,12 @@
 import { mat4, vec4 } from 'gl-matrix';
 import { inject, injectable } from 'inversify';
-import { getDistanceScales } from 'viewport-mercator-project';
 import { TYPES } from '../../types';
+import { getDistanceScales } from '../../utils/project';
 import ICameraService from '../camera/ICameraService';
 import ICoordinateSystemService, {
   CoordinateSystem,
 } from './ICoordinateSystemService';
 
-// 高于 12 缩放等级采用 deck.gl 的偏移坐标系
-const LNGLAT_OFFSET_ZOOM_THRESHOLD = 12;
 const VECTOR_TO_POINT_MATRIX = [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0];
 
 // 后续传入 Shader 的变量
@@ -28,10 +26,11 @@ export default class CoordinateSystemService
   private readonly cameraService: ICameraService;
 
   /**
-   * 1. 经纬度
+   * 1. Web 墨卡托坐标系
    * 2. 偏移经纬度，用于解决高精度抖动问题
    * 3. 瓦片坐标，用于数据瓦片
    * 4. 常规世界坐标系，用于常规 2D/3D 可视化场景
+   * 5. P20 坐标系，高德地图使用
    * @see https://yuque.antfin-inc.com/yuqi.pyq/fgetpa/doml91
    */
   private coordinateSystem: CoordinateSystem;
@@ -70,11 +69,12 @@ export default class CoordinateSystemService
    */
   public refresh(): void {
     const zoom = this.cameraService.getZoom();
+    const zoomScale = this.cameraService.getZoomScale();
     const center = this.cameraService.getCenter();
 
     // 计算像素到米以及经纬度之间的转换
     const { pixelsPerMeter, pixelsPerDegree } = getDistanceScales({
-      longitude: center[0],
+      // longitude: center[0],
       latitude: center[1],
       zoom,
     });
@@ -84,19 +84,27 @@ export default class CoordinateSystemService
     this.pixelsPerDegree = pixelsPerDegree;
     this.pixelsPerDegree2 = [0, 0, 0];
 
-    // TODO: 判断是否应用瓦片 & 常规坐标系
-    if (zoom > LNGLAT_OFFSET_ZOOM_THRESHOLD) {
-      this.coordinateSystem = CoordinateSystem.LNGLAT_OFFSET;
-      this.calculateLnglatOffset(center, zoom);
-    } else {
-      this.coordinateSystem = CoordinateSystem.LNGLAT;
+    if (
+      this.coordinateSystem === CoordinateSystem.LNGLAT ||
+      this.coordinateSystem === CoordinateSystem.P20
+    ) {
       // 继续使用相机服务计算的 VP 矩阵
       this.cameraService.setViewProjectionMatrix(undefined);
+    } else if (this.coordinateSystem === CoordinateSystem.LNGLAT_OFFSET) {
+      this.calculateLnglatOffset(center, zoom);
+    } else if (this.coordinateSystem === CoordinateSystem.P20_OFFSET) {
+      this.calculateLnglatOffset(center, zoom, zoomScale, true);
     }
+
+    // TODO: 判断是否应用瓦片 & 常规坐标系
   }
 
-  public getCoordniateSystem(): CoordinateSystem {
+  public getCoordinateSystem(): CoordinateSystem {
     return this.coordinateSystem;
+  }
+
+  public setCoordinateSystem(coordinateSystem: CoordinateSystem) {
+    this.coordinateSystem = coordinateSystem;
   }
 
   public getViewportCenter(): [number, number] {
@@ -119,16 +127,23 @@ export default class CoordinateSystemService
     return this.pixelsPerMeter;
   }
 
-  private calculateLnglatOffset(center: [number, number], zoom: number) {
+  private calculateLnglatOffset(
+    center: [number, number],
+    zoom: number,
+    scale?: number,
+    flipY?: boolean,
+  ) {
     // http://uber-common.github.io/viewport-mercator-project/docs/api-reference/web-mercator-utils#code-classlanguage-textgetdistancescalesviewportcode
     const {
       pixelsPerMeter: ppm,
       pixelsPerDegree: ppd,
       pixelsPerDegree2,
     } = getDistanceScales({
-      longitude: center[0],
+      // longitude: center[0],
       latitude: center[1],
       zoom,
+      scale,
+      flipY,
       highPrecision: true,
     });
 

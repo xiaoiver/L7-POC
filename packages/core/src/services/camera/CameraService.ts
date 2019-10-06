@@ -1,9 +1,6 @@
 import { inject, injectable } from 'inversify';
-import { ILogger, LoggingContext } from 'inversify-logging';
-import WebMercatorViewport from 'viewport-mercator-project';
-import { TYPES } from '../../types';
-import { IMapCamera } from '../map/IMapService';
-import ICameraService from './CameraService';
+// import { ILogger, LoggingContext } from 'inversify-logging';
+import ICameraService, { IViewport } from './ICameraService';
 
 // 后续传入 Shader 的变量
 export const CameraUniform = {
@@ -12,76 +9,68 @@ export const CameraUniform = {
   ViewProjectionMatrix: 'u_ViewProjectionMatrix',
   Zoom: 'u_Zoom',
   ZoomScale: 'u_ZoomScale',
+  FocalDistance: 'u_FocalDistance',
 };
 
 @injectable()
-@LoggingContext('CameraService')
+// @LoggingContext('CameraService')
 export default class CameraService implements ICameraService {
-  @inject(TYPES.ILogService)
-  private readonly logger: ILogger;
+  // @inject(TYPES.ILogService)
+  // private readonly logger: ILogger;
 
-  private mapCamera: Partial<IMapCamera>;
+  private viewport: IViewport;
 
-  private zoom: number;
-
-  private center: [number, number];
-
-  private viewport: WebMercatorViewport;
-
-  private viewProjectionMatrix: number[] | undefined;
+  /**
+   * 不使用 Viewport 计算的 VP 矩阵，例如偏移坐标系场景
+   */
+  private overridedViewProjectionMatrix: number[] | undefined;
 
   public init() {
     //
   }
 
   /**
-   * 根据相机参数创建视口，包含 VP 矩阵等
-   * @param mapCamera 地图相机
+   * 同步根据相机参数创建的视口
    */
-  public update(mapCamera: Partial<IMapCamera>) {
-    this.logger.info('camera updated...');
-    this.mapCamera = mapCamera;
-
-    const { center, zoom, pitch, bearing, height, width } = mapCamera;
-
-    this.viewport = new WebMercatorViewport({
-      width,
-      height,
-      longitude: center && center[0],
-      latitude: center && center[1],
-      zoom,
-      pitch,
-      bearing,
-    });
-
-    this.zoom = zoom as number;
-    this.center = center as [number, number];
+  public update(viewport: IViewport) {
+    // this.logger.info('camera updated...');
+    this.viewport = viewport;
   }
 
   public getProjectionMatrix(): number[] {
-    return this.viewport.projectionMatrix;
+    return this.viewport.getProjectionMatrix();
   }
 
   public getViewMatrix(): number[] {
-    return this.viewport.viewMatrix;
+    return this.viewport.getViewMatrix();
   }
 
   public getViewMatrixUncentered(): number[] {
-    // @ts-ignore
-    return this.viewport.viewMatrixUncentered;
+    return this.viewport.getViewMatrixUncentered();
   }
 
   public getViewProjectionMatrix(): number[] {
-    // @ts-ignore
-    return this.viewProjectionMatrix || this.viewport.viewProjectionMatrix;
+    return (
+      this.overridedViewProjectionMatrix ||
+      this.viewport.getViewProjectionMatrix()
+    );
   }
 
   public getZoom(): number {
-    return this.zoom;
+    return this.viewport.getZoom();
+  }
+
+  public getZoomScale(): number {
+    return this.viewport.getZoomScale();
   }
 
   public getCenter(): [number, number] {
-    return this.center;
+    const [lng, lat] = this.viewport.getCenter();
+    return [lng, lat];
+  }
+
+  public getFocalDistance() {
+    return this.viewport.getFocalDistance();
   }
 
   public projectFlat(
@@ -95,6 +84,6 @@ export default class CameraService implements ICameraService {
    * 支持外部计算 VP 矩阵的场景，例如：在偏移坐标系场景中，需要重新计算 VP 矩阵
    */
   public setViewProjectionMatrix(viewProjectionMatrix: number[] | undefined) {
-    this.viewProjectionMatrix = viewProjectionMatrix;
+    this.overridedViewProjectionMatrix = viewProjectionMatrix;
   }
 }

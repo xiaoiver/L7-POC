@@ -1,5 +1,5 @@
 import {
-  glEnum,
+  gl,
   ILayer,
   ILayerStyleOptions,
   ILayerStyleService,
@@ -79,13 +79,13 @@ export default class PointLayer extends BaseLayer {
           a_Position: createAttribute({
             buffer: createBuffer({
               data: positionBuffer,
-              type: glEnum.FLOAT,
+              type: gl.FLOAT,
             }),
           }),
           a_packed_data: createAttribute({
             buffer: createBuffer({
               data: packedBuffer,
-              type: glEnum.FLOAT,
+              type: gl.FLOAT,
             }),
           }),
         },
@@ -93,11 +93,21 @@ export default class PointLayer extends BaseLayer {
         fs,
         vs,
         count: indexBuffer.length,
-        primitive: glEnum.TRIANGLES,
+        primitive: gl.TRIANGLES,
         elements: createElements({
           data: indexBuffer,
-          type: glEnum.UNSIGNED_SHORT,
+          type: gl.UNSIGNED_SHORT,
         }),
+        depth: { enable: false },
+        blend: {
+          enable: true,
+          func: {
+            srcRGB: gl.SRC_ALPHA,
+            srcAlpha: 1,
+            dstRGB: gl.ONE_MINUS_SRC_ALPHA,
+            dstAlpha: 1,
+          },
+        },
       }),
     );
   }

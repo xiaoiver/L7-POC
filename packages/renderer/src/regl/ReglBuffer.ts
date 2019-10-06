@@ -1,4 +1,4 @@
-import { glEnum, IBuffer, IBufferInitializationOptions } from '@l7-poc/core';
+import { gl, IBuffer, IBufferInitializationOptions } from '@l7-poc/core';
 import regl from 'regl';
 import { dataTypeMap, usageMap } from './constants';
 
@@ -7,17 +7,14 @@ import { dataTypeMap, usageMap } from './constants';
  * @see https://github.com/regl-project/regl/blob/gh-pages/API.md#buffers
  */
 export default class ReglBuffer implements IBuffer {
-  private gl: regl.Regl;
   private buffer: regl.Buffer;
 
-  constructor(gl: regl.Regl, options: IBufferInitializationOptions) {
-    this.gl = gl;
-
+  constructor(reGl: regl.Regl, options: IBufferInitializationOptions) {
     const { data, usage, type } = options;
-    this.buffer = this.gl.buffer({
+    this.buffer = reGl.buffer({
       data,
-      usage: usageMap[usage || glEnum.STATIC_DRAW],
-      type: dataTypeMap[type || glEnum.UNSIGNED_BYTE],
+      usage: usageMap[usage || gl.STATIC_DRAW],
+      type: dataTypeMap[type || gl.UNSIGNED_BYTE],
       // length: 0,
     });
   }

@@ -25,14 +25,14 @@ module.exports = (api) => {
       [
         '@babel/plugin-proposal-decorators',
         {
-          legacy: true
+          legacy: true,
         }
       ],
       [
         '@babel/plugin-proposal-class-properties',
         {
           // @see https://github.com/storybookjs/storybook/issues/6069#issuecomment-472544973
-          loose: true
+          loose: true,
         }
       ],
       '@babel/plugin-syntax-dynamic-import',
@@ -42,8 +42,9 @@ module.exports = (api) => {
         'babel-plugin-inline-import',
         {
           extensions: [
-            '.json',
-            '.glsl'
+            // 由于使用了 TS 的 resolveJsonModule 选项，JSON 可以直接引入，不需要当作纯文本
+            // '.json',
+            '.glsl',
           ]
         }
       ],

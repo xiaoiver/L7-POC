@@ -5,6 +5,7 @@ import {
   ICoordinateSystemService,
   ILayer,
   ILayerPlugin,
+  IRendererService,
   lazyInject,
   TYPES,
 } from '@l7-poc/core';
@@ -23,10 +24,15 @@ export default class ShaderUniformPlugin implements ILayerPlugin {
   @lazyInject(TYPES.ICoordinateSystemService)
   private readonly coordinateSystemService: ICoordinateSystemService;
 
+  @lazyInject(TYPES.IRendererService)
+  private readonly rendererService: IRendererService;
+
   public apply(layer: ILayer) {
     layer.hooks.beforeRender.tap('ShaderUniformPlugin', () => {
       // 重新计算坐标系参数
       this.coordinateSystemService.refresh();
+
+      const { width, height } = this.rendererService.getViewportSize();
 
       layer.models.forEach((model) =>
         model.addUniforms({
@@ -35,14 +41,18 @@ export default class ShaderUniformPlugin implements ILayerPlugin {
           [CameraUniform.ViewMatrix]: this.cameraService.getViewMatrix(),
           [CameraUniform.ViewProjectionMatrix]: this.cameraService.getViewProjectionMatrix(),
           [CameraUniform.Zoom]: this.cameraService.getZoom(),
-          [CameraUniform.ZoomScale]: Math.pow(2, this.cameraService.getZoom()),
+          [CameraUniform.ZoomScale]: this.cameraService.getZoomScale(),
+          [CameraUniform.FocalDistance]: this.cameraService.getFocalDistance(),
           // 坐标系参数
-          [CoordinateUniform.CoordinateSystem]: this.coordinateSystemService.getCoordniateSystem(),
+          [CoordinateUniform.CoordinateSystem]: this.coordinateSystemService.getCoordinateSystem(),
           [CoordinateUniform.ViewportCenter]: this.coordinateSystemService.getViewportCenter(),
           [CoordinateUniform.ViewportCenterProjection]: this.coordinateSystemService.getViewportCenterProjection(),
           [CoordinateUniform.PixelsPerDegree]: this.coordinateSystemService.getPixelsPerDegree(),
           [CoordinateUniform.PixelsPerDegree2]: this.coordinateSystemService.getPixelsPerDegree2(),
           [CoordinateUniform.PixelsPerMeter]: this.coordinateSystemService.getPixelsPerMeter(),
+          // 其他参数
+          u_ViewportSize: [width, height],
+          u_DevicePixelRatio: window.devicePixelRatio,
         }),
       );
 

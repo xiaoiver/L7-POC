@@ -1,5 +1,7 @@
 import { AsyncParallelHook, SyncHook } from 'tapable';
+import { IMapConfig } from '../map/IMapService';
 import IModel from '../renderer/IModel';
+import { IRenderConfig } from '../renderer/IRendererService';
 import { ILayerStyleOptions } from './ILayerStyleService';
 
 export interface ILayer {
@@ -26,17 +28,7 @@ export interface ILayerPlugin {
  * 提供 Layer 管理服务
  */
 export default interface ILayerService {
-  hooks: {
-    /**
-     * 渲染前调用
-     */
-    beforeRender: AsyncParallelHook<ILayer[]>;
-    /**
-     * 渲染后调用
-     */
-    afterRender: AsyncParallelHook<ILayer[]>;
-  };
   add(layer: ILayer): void;
   initLayers(): void;
-  renderLayers(): Promise<void>;
+  renderLayers(enableMultiPassRenderer: boolean): void;
 }

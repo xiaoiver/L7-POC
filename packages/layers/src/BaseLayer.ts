@@ -1,5 +1,5 @@
 import {
-  glEnum,
+  gl,
   ILayer,
   ILayerPlugin,
   ILayerStyleOptions,
@@ -33,12 +33,14 @@ export default class BaseLayer implements ILayer {
     new ShaderUniformPlugin(),
   ];
 
+  /**
+   * @example
+   * pointLayer.addPlugin(new MyCustomPlugin(), {
+   *   before: 'L7BuiltinPlugin'
+   * });
+   */
   public addPlugin(plugin: ILayerPlugin) {
     // TODO: 控制插件注册顺序
-    // @example:
-    // pointLayer.addPlugin(new MyCustomPlugin(), {
-    //   before: 'L7BuiltinPlugin'
-    // });
     this.plugins.push(plugin);
   }
 

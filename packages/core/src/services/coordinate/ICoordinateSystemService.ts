@@ -4,6 +4,7 @@
  * 2. 偏移经纬度，用于解决高精度抖动问题
  * 3. 瓦片坐标，用于数据瓦片
  * 4. 常规世界坐标系，用于常规 2D/3D 可视化场景
+ * 5. P20
  * @see https://yuque.antfin-inc.com/yuqi.pyq/fgetpa/doml91
  */
 
@@ -13,11 +14,15 @@ export enum CoordinateSystem {
   LNGLAT_OFFSET = 2.0,
   VECTOR_TILE = 3.0,
   IDENTITY = 4.0,
+  P20 = 5.0,
+  P20_OFFSET = 6.0,
+  METER_OFFSET = 7.0,
 }
 
 export default interface ICoordinateSystemService {
   refresh(): void;
-  getCoordniateSystem(): CoordinateSystem;
+  getCoordinateSystem(): CoordinateSystem;
+  setCoordinateSystem(coordinateSystem: CoordinateSystem): void;
   getViewportCenter(): [number, number];
   getViewportCenterProjection(): [number, number, number, number];
   getPixelsPerDegree(): [number, number, number];

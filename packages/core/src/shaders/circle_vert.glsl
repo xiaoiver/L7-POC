@@ -38,10 +38,10 @@ void main() {
   float radius = compressed;
   v_radius = radius;
 
-  vec2 offset = extrude * (radius + u_stroke_width);
-
+  vec2 offset = project_pixel(extrude * (radius + u_stroke_width));
   vec4 project_pos = project_position(vec4(a_Position.xy, 0.0, 1.0));
 
+  // TODO: billboard
   gl_Position = project_common_position_to_clipspace(vec4(project_pos.xy + offset, 0.0, 1.0));
 
   // anti-alias

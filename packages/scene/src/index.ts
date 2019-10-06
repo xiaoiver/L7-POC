@@ -3,6 +3,7 @@ import {
   ILayer,
   IMapConfig,
   IMapService,
+  IRenderConfig,
   IRendererService,
   ISceneService,
   MapType,
@@ -32,8 +33,8 @@ container
 class Scene {
   private sceneService: ISceneService;
 
-  public constructor(mapConfig: IMapConfig) {
-    const { type = MapType.amap } = mapConfig;
+  public constructor(config: IMapConfig & IRenderConfig) {
+    const { type = MapType.amap } = config;
 
     // 根据用户传入参数绑定地图服务
     let mapService: new (...args: any[]) => IMapService;
@@ -55,7 +56,7 @@ class Scene {
 
     // 依赖注入
     this.sceneService = container.resolve(SceneService);
-    this.sceneService.init(mapConfig);
+    this.sceneService.init(config);
   }
 
   public addLayer(layer: ILayer): void {

@@ -2,6 +2,7 @@ import { PointLayer } from '@l7-poc/layers';
 import { Scene } from '@l7-poc/scene';
 import * as dat from 'dat.gui';
 import * as React from 'react';
+import data from './data.json';
 
 export default class Mapbox extends React.Component {
   private gui: dat.GUI;
@@ -17,22 +18,20 @@ export default class Mapbox extends React.Component {
   }
 
   public async componentDidMount() {
-    const response = await fetch(
-      'https://d2ad6b4ur7yvpq.cloudfront.net/naturalearth-3.3.0/ne_10m_geography_regions_points.geojson',
-    );
     const scene = new Scene({
       id: 'map',
       type: 'mapbox',
       style: 'mapbox://styles/mapbox/streets-v9',
       center: [120.19382669582967, 30.258134],
       pitch: 0,
-      zoom: 1,
+      zoom: 2,
+      enableMultiPassRenderer: true,
     });
     const pointLayer = new PointLayer();
 
     // TODO: new GeoJSONSource()
     pointLayer.source({
-      data: await response.json(),
+      data,
     });
     scene.addLayer(pointLayer);
     scene.render();

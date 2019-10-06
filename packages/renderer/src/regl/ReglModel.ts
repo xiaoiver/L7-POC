@@ -1,26 +1,35 @@
 import {
-  glEnum,
+  gl,
   IModel,
   IModelDrawOptions,
   IModelInitializationOptions,
+  IUniform,
 } from '@l7-poc/core';
 import regl from 'regl';
-import { primitiveMap } from './constants';
+import {
+  blendEquationMap,
+  blendFuncMap,
+  cullFaceMap,
+  depthFuncMap,
+  primitiveMap,
+  stencilFuncMap,
+  stencilOpMap,
+} from './constants';
 import ReglAttribute from './ReglAttribute';
 import ReglElements from './ReglElements';
+import ReglFramebuffer from './ReglFramebuffer';
+import ReglTexture2D from './ReglTexture2D';
 
 /**
  * adaptor for regl.DrawCommand
  */
 export default class ReglModel implements IModel {
-  private gl: regl.Regl;
   private drawCommand: regl.DrawCommand;
   private uniforms: {
-    [key: string]: number | number[] | boolean;
+    [key: string]: IUniform;
   } = {};
 
-  constructor(gl: regl.Regl, options: IModelInitializationOptions) {
-    this.gl = gl;
+  constructor(reGl: regl.Regl, options: IModelInitializationOptions) {
     const {
       vs,
       fs,
@@ -29,14 +38,19 @@ export default class ReglModel implements IModel {
       primitive,
       count,
       elements,
+      depth,
+      blend,
+      stencil,
+      cull,
     } = options;
 
-    const reglUniforms: { [key: string]: any } = {};
+    const reglUniforms: { [key: string]: IUniform } = {};
     if (uniforms) {
       this.uniforms = uniforms;
       Object.keys(uniforms).forEach((uniformName) => {
+        // use regl prop API
         // @ts-ignore
-        reglUniforms[uniformName] = this.gl.prop(uniformName);
+        reglUniforms[uniformName] = reGl.prop(uniformName);
       });
     }
 
@@ -51,34 +65,23 @@ export default class ReglModel implements IModel {
       uniforms: reglUniforms,
       vert: vs,
       primitive:
-        primitiveMap[primitive === undefined ? glEnum.TRIANGLES : primitive],
+        primitiveMap[primitive === undefined ? gl.TRIANGLES : primitive],
       count,
-      depth: {
-        enable: false,
-      },
-      blend: {
-        enable: true,
-        func: {
-          srcRGB: 'src alpha',
-          srcAlpha: 1,
-          dstRGB: 'one minus src alpha',
-          dstAlpha: 1,
-        },
-      },
-      // cull: {
-      //   enable: false,
-      //   face: 'back',
-      // },
     };
 
     if (elements) {
       drawParams.elements = (elements as ReglElements).get();
     }
 
-    this.drawCommand = this.gl(drawParams);
+    this.initDepthDrawParams({ depth }, drawParams);
+    this.initBlendDrawParams({ blend }, drawParams);
+    this.initStencilDrawParams({ stencil }, drawParams);
+    this.initCullDrawParams({ cull }, drawParams);
+
+    this.drawCommand = reGl(drawParams);
   }
 
-  public addUniforms(uniforms: { [key: string]: number | number[] | boolean }) {
+  public addUniforms(uniforms: { [key: string]: IUniform }) {
     this.uniforms = {
       ...this.uniforms,
       ...uniforms,
@@ -86,10 +89,150 @@ export default class ReglModel implements IModel {
   }
 
   public draw(options: IModelDrawOptions) {
-    // @ts-ignore
-    this.drawCommand({
+    const uniforms: {
+      [key: string]: IUniform;
+    } = {
       ...this.uniforms,
       ...options.uniforms,
+    };
+
+    const reglDrawProps: {
+      [key: string]:
+        | regl.Framebuffer
+        | regl.Texture2D
+        | number
+        | number[]
+        | boolean;
+    } = {};
+
+    Object.keys(uniforms).forEach((uniformName: string) => {
+      const type = typeof uniforms[uniformName];
+      if (
+        type === 'boolean' ||
+        type === 'number' ||
+        Array.isArray(uniforms[uniformName]) ||
+        // @ts-ignore
+        uniforms[uniformName].BYTES_PER_ELEMENT
+      ) {
+        reglDrawProps[uniformName] = uniforms[uniformName] as
+          | number
+          | number[]
+          | boolean;
+      } else {
+        reglDrawProps[uniformName] = (uniforms[uniformName] as
+          | ReglFramebuffer
+          | ReglTexture2D).get();
+      }
     });
+
+    this.drawCommand(reglDrawProps);
+  }
+
+  /**
+   * @see https://github.com/regl-project/regl/blob/gh-pages/API.md#depth-buffer
+   */
+  private initDepthDrawParams(
+    { depth }: Pick<IModelInitializationOptions, 'depth'>,
+    drawParams: regl.DrawConfig,
+  ) {
+    if (depth) {
+      drawParams.depth = {
+        enable: depth.enable === undefined ? true : !!depth.enable,
+        mask: depth.mask === undefined ? true : !!depth.mask,
+        func: depthFuncMap[depth.func || gl.LESS],
+        range: depth.range || [0, 1],
+      };
+    }
+  }
+
+  /**
+   * @see https://github.com/regl-project/regl/blob/gh-pages/API.md#blending
+   */
+  private initBlendDrawParams(
+    { blend }: Pick<IModelInitializationOptions, 'blend'>,
+    drawParams: regl.DrawConfig,
+  ) {
+    if (blend) {
+      const { enable, func, equation, color = [0, 0, 0, 0] } = blend;
+      // @ts-ignore
+      drawParams.blend = {
+        enable: enable === undefined ? false : !!enable,
+        func: {
+          srcRGB: blendFuncMap[(func && func.srcRGB) || gl.SRC_ALPHA],
+          srcAlpha: func && func.srcAlpha,
+          dstRGB: blendFuncMap[(func && func.dstRGB) || gl.ONE_MINUS_SRC_ALPHA],
+          dstAlpha: func && func.dstAlpha,
+        },
+        equation: {
+          rgb: blendEquationMap[(equation && equation.rgb) || gl.FUNC_ADD],
+          alpha: blendEquationMap[(equation && equation.alpha) || gl.FUNC_ADD],
+        },
+        color,
+      };
+    }
+  }
+
+  /**
+   * @see https://github.com/regl-project/regl/blob/gh-pages/API.md#stencil
+   */
+  private initStencilDrawParams(
+    { stencil }: Pick<IModelInitializationOptions, 'stencil'>,
+    drawParams: regl.DrawConfig,
+  ) {
+    if (stencil) {
+      const {
+        enable,
+        mask = -1,
+        func = {
+          cmp: gl.ALWAYS,
+          ref: 0,
+          mask: -1,
+        },
+        opFront = {
+          fail: gl.KEEP,
+          zfail: gl.KEEP,
+          zpass: gl.KEEP,
+        },
+        opBack = {
+          fail: gl.KEEP,
+          zfail: gl.KEEP,
+          zpass: gl.KEEP,
+        },
+      } = stencil;
+      drawParams.stencil = {
+        enable: enable === undefined ? false : !!enable,
+        mask,
+        func: {
+          ...func,
+          cmp: stencilFuncMap[func.cmp],
+        },
+        opFront: {
+          fail: stencilOpMap[opFront.fail],
+          zfail: stencilOpMap[opFront.zfail],
+          zpass: stencilOpMap[opFront.zpass],
+        },
+        opBack: {
+          fail: stencilOpMap[opBack.fail],
+          zfail: stencilOpMap[opBack.zfail],
+          zpass: stencilOpMap[opBack.zpass],
+        },
+      };
+    }
+  }
+
+  /**
+   * @see https://github.com/regl-project/regl/blob/gh-pages/API.md#culling
+   */
+  private initCullDrawParams(
+    { cull }: Pick<IModelInitializationOptions, 'cull'>,
+    drawParams: regl.DrawConfig,
+  ) {
+    if (cull) {
+      const { enable, face = gl.BACK } = cull;
+      drawParams.cull = {
+        enable: enable === undefined ? false : !!enable,
+        face: cullFaceMap[face],
+      };
+    }
   }
 }

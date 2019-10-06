@@ -1,4 +1,4 @@
-import { glEnum } from './glenum';
+import { gl } from './gl';
 
 export interface IBufferInitializationOptions {
   data: number[] | number[][] | Uint8Array | Uint16Array | Uint32Array;
@@ -6,12 +6,12 @@ export interface IBufferInitializationOptions {
   /**
    * gl.DRAW_STATIC | gl.DYNAMIC_DRAW | gl.STREAM_DRAW
    */
-  usage?: glEnum.STATIC_DRAW | glEnum.DYNAMIC_DRAW | glEnum.STREAM_DRAW;
+  usage?: gl.STATIC_DRAW | gl.DYNAMIC_DRAW | gl.STREAM_DRAW;
 
   /**
    * gl.Float | gl.UNSIGNED_BYTE | ...
    */
-  type?: glEnum.FLOAT | glEnum.UNSIGNED_BYTE;
+  type?: gl.FLOAT | gl.UNSIGNED_BYTE;
   length?: number;
 }
 

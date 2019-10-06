@@ -1,13 +1,10 @@
 import * as React from 'react';
 import { Scene } from '@l7-poc/scene';
 import { PointLayer } from '@l7-poc/layers';
+import data from './data.json';
 
 export default class AMap extends React.Component {
-  public async componentDidMount() {
-    const response = await fetch(
-      'https://d2ad6b4ur7yvpq.cloudfront.net/naturalearth-3.3.0/ne_10m_geography_regions_points.geojson',
-    );
-
+  public componentDidMount() {
     const scene = new Scene({
       center: [120.19382669582967, 30.258134],
       id: 'map',
@@ -15,10 +12,11 @@ export default class AMap extends React.Component {
       style: 'dark',
       type: 'amap',
       zoom: 1,
+      enableMultiPassRenderer: true,
     });
     const pointLayer = new PointLayer();
     pointLayer.source({
-      data: await response.json(),
+      data,
     });
     scene.addLayer(pointLayer);
     scene.render();

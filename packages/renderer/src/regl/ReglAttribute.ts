@@ -6,12 +6,9 @@ import ReglBuffer from './ReglBuffer';
  * @see https://github.com/regl-project/regl/blob/gh-pages/API.md#attributes
  */
 export default class ReglAttribute implements IAttribute {
-  private gl: regl.Regl;
   private attribute: regl.Attribute;
 
   constructor(gl: regl.Regl, options: IAttributeInitializationOptions) {
-    this.gl = gl;
-
     const { buffer, offset, stride, normalized, size, divisor } = options;
 
     this.attribute = {

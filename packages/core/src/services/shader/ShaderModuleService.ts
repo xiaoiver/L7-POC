@@ -1,5 +1,5 @@
 import { inject, injectable } from 'inversify';
-import { ILogger, LoggingContext } from 'inversify-logging';
+// import { ILogger, LoggingContext } from 'inversify-logging';
 import { uniq } from 'lodash';
 import { TYPES } from '../../types';
 import { extractUniforms } from '../../utils/shader-module';
@@ -17,9 +17,9 @@ const globalDefaultprecision =
 const includeRegExp = /#pragma include (["^+"]?["\ "[a-zA-Z_0-9](.*)"]*?)/g;
 
 @injectable()
-@LoggingContext('ShaderModuleService')
+// @LoggingContext('ShaderModuleService')
 export default class ShaderModuleService implements IShaderModuleService {
-  @inject(TYPES.ILogService) public logger: ILogger;
+  // @inject(TYPES.ILogService) public logger: ILogger;
 
   private moduleCache: { [key: string]: IModuleParams } = {};
   private rawContentCache: { [key: string]: IModuleParams } = {};
@@ -30,10 +30,15 @@ export default class ShaderModuleService implements IShaderModuleService {
     this.registerModule('sdf_2d', { vs: '', fs: sdf2d });
     this.registerModule('circle', { vs: circleVert, fs: circleFrag });
 
-    this.logger.info('builtin modules compiled');
+    // this.logger.info('builtin modules compiled');
   }
 
   public registerModule(moduleName: string, moduleParams: IModuleParams) {
+    // prevent registering the same module multiple times
+    if (this.rawContentCache[moduleName]) {
+      return;
+    }
+
     const { vs, fs, uniforms: declaredUniforms } = moduleParams;
     const { content: extractedVS, uniforms: vsUniforms } = extractUniforms(vs);
     const { content: extractedFS, uniforms: fsUniforms } = extractUniforms(fs);
